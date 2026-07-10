@@ -1,0 +1,187 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:is(.dark *));
+
+/* ================================
+   Hide number input increment/decrement arrows
+================================ */
+
+/* Chrome, Safari, Edge, Opera */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+/* ================================
+   Disable textarea resizing
+================================ */
+
+textarea {
+  resize: none;
+}
+/* Suppress all scrollbars globally for a sleek web app experience */
+::-webkit-scrollbar {
+  display: none;
+}
+html {
+  scrollbar-width: none;
+}
+body {
+  -ms-overflow-style: none;
+}
+html,
+body {
+  overflow-x: hidden;
+}
+
+/* Remove number input spin arrows */
+input[type='number']::-webkit-outer-spin-button,
+input[type='number']::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type='number'] {
+  -moz-appearance: textfield;
+}
+
+:root {
+  --radius: 0.625rem;
+  --background: #FFFFFF; /* Pure White background */
+  --foreground: #0F172A; /* slate-900 */
+  --card: #FFFFFF; /* Pure White */
+  --card-foreground: #0F172A;
+  --popover: #FFFFFF;
+  --popover-foreground: #0F172A;
+  --primary: #2563EB;
+  --primary-foreground: #FFFFFF;
+  --secondary: #F8FAFC;
+  --secondary-foreground: #0F172A;
+  --muted: #F8FAFC;
+  --muted-foreground: #64748B;
+  --accent: #F8FAFC;
+  --accent-foreground: #0F172A;
+  --destructive: #EF4444;
+  --border: #E2E8F0;
+  --input: #E2E8F0;
+  --ring: #3B82F6;
+
+  /* Brand colors */
+  --primary-blue: #2563EB;
+  --deep-blue: #1E3A8A;
+  --navy: #172554;
+  --sky-blue: #38BDF8;
+  --light-blue: #DBEAFE;
+  --pale-blue: #EFF6FF;
+  
+  --success: #22C55E;
+  --warning: #F59E0B;
+  --error: #EF4444;
+
+  --neutral-bg: #FFFFFF;
+  --neutral-sec-bg: #F8FAFC;
+  --card-bg: #FFFFFF;
+  --border-color: #E2E8F0;
+}
+
+.dark {
+  --background: #0B0F19; /* Deep slate dark navy */
+  --foreground: #F8FAFC;
+  --card: #111827; /* Dark card background */
+  --card-foreground: #F8FAFC;
+  --popover: #111827;
+  --popover-foreground: #F8FAFC;
+  --primary: #3B82F6;
+  --primary-foreground: #FFFFFF;
+  --secondary: #1F2937;
+  --secondary-foreground: #F8FAFC;
+  --muted: #1F2937;
+  --muted-foreground: #9CA3AF;
+  --accent: #1F2937;
+  --accent-foreground: #F8FAFC;
+  --destructive: #EF4444;
+  --border: #1F2937;
+  --input: #1F2937;
+  --ring: #3B82F6;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --font-sans: var(--font-inter), system-ui, sans-serif;
+  --font-display: var(--font-poppins), system-ui, sans-serif;
+  
+  --color-primary-blue: var(--primary-blue);
+  --color-deep-blue: var(--deep-blue);
+  --color-navy: var(--navy);
+  --color-sky-blue: var(--sky-blue);
+  --color-light-blue: var(--light-blue);
+  --color-pale-blue: var(--pale-blue);
+  
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-error: var(--error);
+  
+  --color-neutral-bg: var(--neutral-bg);
+  --color-neutral-sec-bg: var(--neutral-sec-bg);
+  --color-card-bg: var(--card-bg);
+  --color-border-color: var(--border-color);
+  
+  --animate-marquee: marquee 30s linear infinite;
+  
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+  
+  @keyframes marquee {
+    0% { transform: translateX(0%); }
+    100% { transform: translateX(-50%); }
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html, body {
+    @apply bg-background text-foreground;
+    overflow-x: hidden !important;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+}

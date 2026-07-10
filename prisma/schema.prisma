@@ -1,0 +1,181 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  ADMIN
+  USER
+}
+
+enum CampaignStatus {
+  DRAFT
+  ACTIVE
+  COMPLETED
+}
+
+enum DonationStatus {
+  PENDING
+  SUCCESSFUL
+  FAILED
+}
+
+enum ApplicationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum PostStatus {
+  DRAFT
+  PUBLISHED
+}
+
+enum EventStatus {
+  UPCOMING
+  PAST
+  CANCELLED
+}
+
+model User {
+  id                    String                 @id @default(uuid())
+  email                 String                 @unique
+  password              String
+  name                  String
+  role                  Role                   @default(USER)
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @updatedAt
+  donations             Donation[]
+  volunteerApplications VolunteerApplication[]
+}
+
+model Campaign {
+  id           String         @id @default(uuid())
+  title        String
+  slug         String         @unique
+  description  String         @db.Text
+  image        String
+  targetAmount Float
+  raisedAmount Float          @default(0)
+  deadline     DateTime?
+  status       CampaignStatus @default(DRAFT)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  donations    Donation[]
+}
+
+model Donation {
+  id            String         @id @default(uuid())
+  amount        Float
+  donorName     String?
+  donorEmail    String?
+  isAnonymous   Boolean        @default(false)
+  status        DonationStatus @default(PENDING)
+  paymentMethod String         // PAYSTACK, FLUTTERWAVE, STRIPE, BANK_TRANSFER, CRYPTO, etc.
+  reference     String         @unique
+  campaignId    String?
+  campaign      Campaign?      @relation(fields: [campaignId], references: [id], onDelete: SetNull)
+  userId        String?
+  user          User?          @relation(fields: [userId], references: [id], onDelete: SetNull)
+  createdAt     DateTime       @default(now())
+}
+
+model VolunteerApplication {
+  id           String            @id @default(uuid())
+  name         String
+  email        String
+  phone        String
+  location     String
+  skills       String            @db.Text
+  availability String
+  resumeUrl    String?
+  motivation   String?           @db.Text
+  status       ApplicationStatus @default(PENDING)
+  userId       String?
+  user         User?             @relation(fields: [userId], references: [id], onDelete: SetNull)
+  createdAt    DateTime          @default(now())
+}
+
+model BlogPost {
+  id          String     @id @default(uuid())
+  title       String
+  slug        String     @unique
+  content     String     @db.Text
+  image       String
+  category    String
+  authorName  String
+  authorEmail String
+  status      PostStatus @default(DRAFT)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
+
+model Event {
+  id                  String      @id @default(uuid())
+  title               String
+  description         String      @db.Text
+  date                DateTime
+  venue               String
+  image               String?
+  registrationRequired Boolean     @default(false)
+  attendeesCount      Int         @default(0)
+  status              EventStatus @default(UPCOMING)
+  createdAt           DateTime    @default(now())
+}
+
+model Testimonial {
+  id        String   @id @default(uuid())
+  name      String
+  role      String
+  quote     String   @db.Text
+  image     String?
+  status    Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
+
+model GalleryImage {
+  id        String   @id @default(uuid())
+  url       String
+  caption   String?
+  album     String?
+  createdAt DateTime @default(now())
+}
+
+model TeamMember {
+  id        String   @id @default(uuid())
+  name      String
+  role      String
+  bio       String?  @db.Text
+  image     String?
+  linkedin  String?
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+}
+
+model Partner {
+  id         String   @id @default(uuid())
+  name       String
+  logoUrl    String
+  websiteUrl String?
+  createdAt  DateTime @default(now())
+}
+
+model NewsletterSubscriber {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  action    String
+  details   String?  @db.Text
+  userEmail String?
+  ipAddress String?
+  createdAt DateTime @default(now())
+}
