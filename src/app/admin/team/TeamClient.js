@@ -19,14 +19,16 @@ export default function TeamClient({ initialMembers }) {
   const [deletingId, setDeletingId] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  const filtered = members.filter(
-    (m) =>
-      m.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      m.role.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filtered = members
+    .filter(
+      (m) =>
+        m.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        m.role.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+    .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
 
   const openAddModal = () => {
-    setEditingMember(null);
+    setEditingMember({ order: members.length + 1 });
     setImage("");
     setIsModalOpen(true);
   };
@@ -52,7 +54,7 @@ export default function TeamClient({ initialMembers }) {
     if (res.error) {
       toast.error(res.error);
     } else {
-      toast.success(editingMember ? "Team member updated!" : "Team member added!");
+      toast.success(editingMember?.id ? "Team member updated!" : "Team member added!");
       setIsModalOpen(false);
       window.location.reload();
     }
@@ -125,13 +127,13 @@ export default function TeamClient({ initialMembers }) {
                 </div>
 
                 <div>
-                  <div className="flex items-center justify-between">
-                    <h3 className="font-bold text-base text-foreground">{member.name}</h3>
-                    <span className="text-xs px-2 py-0.5 rounded bg-muted text-muted-foreground font-semibold">
-                      Order: {member.order}
+                  <div className="flex items-start justify-between gap-2">
+                    <h3 className="font-bold text-base text-foreground leading-snug">{member.name}</h3>
+                    <span className="text-xs px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-400 font-extrabold border border-blue-200 dark:border-blue-800 shrink-0">
+                      Order #{member.order}
                     </span>
                   </div>
-                  <p className="text-xs font-semibold text-blue-600 dark:text-blue-400">
+                  <p className="text-xs font-semibold text-blue-600 dark:text-blue-400 mt-1">
                     {member.role}
                   </p>
                 </div>
@@ -178,7 +180,7 @@ export default function TeamClient({ initialMembers }) {
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
           <form
             onSubmit={handleSave}
-            className="bg-card w-full max-w-lg rounded-2xl border border-border p-6 shadow-2xl space-y-4 animate-in fade-in zoom-in duration-200"
+            className="bg-card w-full max-w-lg rounded-2xl border border-border p-6 shadow-2xl space-y-4 animate-in fade-in zoom-in duration-200 max-h-[85vh] overflow-y-auto"
           >
             <h3 className="text-lg font-bold text-foreground">
               {editingMember ? "Edit Team Member" : "Add Team Member"}
