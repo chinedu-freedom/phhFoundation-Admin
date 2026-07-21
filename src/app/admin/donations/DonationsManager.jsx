@@ -54,7 +54,7 @@ export default function DonationsManager({ initialDonations = [], campaigns = []
           onChange={setSelectedCampaign}
           options={campaignOptions}
           placeholder="Filter Campaign..."
-          className="w-full md:w-56"
+          className="w-full md:w-56 "
         />
       </div>
 
