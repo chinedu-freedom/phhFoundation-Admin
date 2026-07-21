@@ -1,11 +1,25 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, Trash2, Edit, UserCheck, Globe, ExternalLink, Search } from "lucide-react";
+import { Plus, Trash2, Edit, UserCheck, Globe, ExternalLink, Search, Mail, Phone } from "lucide-react";
 import ImagePicker from "@/components/ImagePicker";
 import ConfirmDeleteModal from "@/components/ConfirmDeleteModal";
 import { upsertTeamMemberAction, deleteTeamMemberAction } from "@/app/actions/team";
 import { toast } from "sonner";
+
+const Facebook = ({ className }) => (
+  <svg
+    className={className}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
+  </svg>
+);
 
 export default function TeamClient({ initialMembers }) {
   const [members, setMembers] = useState(initialMembers);
@@ -126,7 +140,6 @@ export default function TeamClient({ initialMembers }) {
                   )}
                   <span className="absolute top-2.5 right-2.5 text-xs px-2.5 py-0.5 rounded-full bg-blue-600 text-white font-extrabold shadow-md border border-white/20">
                     Order {member.order}
-                    {/* Order #{member.order} */}
                   </span>
                 </div>
 
@@ -143,16 +156,51 @@ export default function TeamClient({ initialMembers }) {
                   </p>
                 )}
 
-                {member.linkedin && (
-                  <a
-                    href={member.linkedin}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-xs text-blue-600 dark:text-blue-400 hover:underline inline-flex items-center gap-1 font-medium"
-                  >
-                    <Globe className="h-3.5 w-3.5" /> LinkedIn Profile
-                  </a>
-                )}
+                {/* Contact and Social Media Handles */}
+                <div className="flex flex-wrap items-center gap-3 pt-2 text-xs text-muted-foreground border-t border-border/60">
+                  {member.email && (
+                    <a
+                      href={`mailto:${member.email}`}
+                      className="hover:text-blue-600 transition-colors p-1 rounded hover:bg-muted"
+                      title={member.email}
+                    >
+                      <Mail className="h-4 w-4" />
+                    </a>
+                  )}
+                  {(member.whatsapp || member.phone) && (
+                    <a
+                      href={`https://wa.me/${(member.whatsapp || member.phone).replace(/[^0-9]/g, "")}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="hover:text-emerald-600 transition-colors p-1 rounded hover:bg-muted"
+                      title={member.whatsapp || member.phone}
+                    >
+                      <Phone className="h-4 w-4" />
+                    </a>
+                  )}
+                  {member.facebook && (
+                    <a
+                      href={member.facebook}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="hover:text-blue-600 transition-colors p-1 rounded hover:bg-muted"
+                      title="Facebook Profile"
+                    >
+                      <Facebook className="h-4 w-4" />
+                    </a>
+                  )}
+                  {member.linkedin && (
+                    <a
+                      href={member.linkedin}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="hover:text-blue-600 transition-colors p-1 rounded hover:bg-muted"
+                      title="LinkedIn Profile"
+                    >
+                      <Globe className="h-4 w-4" />
+                    </a>
+                  )}
+                </div>
               </div>
 
               <div className="flex justify-end gap-2 pt-3 border-t border-border">
@@ -220,6 +268,58 @@ export default function TeamClient({ initialMembers }) {
 
               <div>
                 <label className="text-xs font-semibold text-muted-foreground block mb-1">
+                  Email Address
+                </label>
+                <input
+                  type="email"
+                  name="email"
+                  defaultValue={editingMember?.email || ""}
+                  placeholder="e.g. member@hhfoundation.org"
+                  className="w-full px-3 py-2 text-sm rounded-lg border border-input bg-background text-foreground"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-semibold text-muted-foreground block mb-1">
+                  Phone / WhatsApp Number
+                </label>
+                <input
+                  type="text"
+                  name="whatsapp"
+                  defaultValue={editingMember?.whatsapp || editingMember?.phone || ""}
+                  placeholder="e.g. +2349066008854"
+                  className="w-full px-3 py-2 text-sm rounded-lg border border-input bg-background text-foreground"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-semibold text-muted-foreground block mb-1">
+                  Facebook Profile URL
+                </label>
+                <input
+                  type="url"
+                  name="facebook"
+                  defaultValue={editingMember?.facebook || ""}
+                  placeholder="https://facebook.com/..."
+                  className="w-full px-3 py-2 text-sm rounded-lg border border-input bg-background text-foreground"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-semibold text-muted-foreground block mb-1">
+                  LinkedIn Profile URL
+                </label>
+                <input
+                  type="url"
+                  name="linkedin"
+                  defaultValue={editingMember?.linkedin || ""}
+                  placeholder="https://linkedin.com/in/..."
+                  className="w-full px-3 py-2 text-sm rounded-lg border border-input bg-background text-foreground"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-semibold text-muted-foreground block mb-1">
                   Profile Photo (Optional)
                 </label>
                 <ImagePicker value={image} onChange={(url) => setImage(url)} />
@@ -234,19 +334,6 @@ export default function TeamClient({ initialMembers }) {
                   rows={3}
                   defaultValue={editingMember?.bio || ""}
                   placeholder="Short bio about leadership role..."
-                  className="w-full px-3 py-2 text-sm rounded-lg border border-input bg-background text-foreground"
-                />
-              </div>
-
-              <div>
-                <label className="text-xs font-semibold text-muted-foreground block mb-1">
-                  LinkedIn Profile URL
-                </label>
-                <input
-                  type="url"
-                  name="linkedin"
-                  defaultValue={editingMember?.linkedin || ""}
-                  placeholder="https://linkedin.com/in/..."
                   className="w-full px-3 py-2 text-sm rounded-lg border border-input bg-background text-foreground"
                 />
               </div>

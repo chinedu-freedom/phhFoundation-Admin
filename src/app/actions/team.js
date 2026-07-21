@@ -10,6 +10,10 @@ export async function upsertTeamMemberAction(prevState, formData) {
   const bio = formData.get("bio")?.toString().trim() || null;
   const image = formData.get("image")?.toString().trim() || null;
   const linkedin = formData.get("linkedin")?.toString().trim() || null;
+  const facebook = formData.get("facebook")?.toString().trim() || null;
+  const email = formData.get("email")?.toString().trim() || null;
+  const phone = formData.get("phone")?.toString().trim() || null;
+  const whatsapp = formData.get("whatsapp")?.toString().trim() || null;
   const orderStr = formData.get("order")?.toString() || "0";
   const order = parseInt(orderStr, 10) || 0;
 
@@ -31,14 +35,16 @@ export async function upsertTeamMemberAction(prevState, formData) {
       };
     }
 
+    const dataPayload = { name, role, bio, image, linkedin, facebook, email, phone, whatsapp, order };
+
     if (id) {
       await prisma.teamMember.update({
         where: { id },
-        data: { name, role, bio, image, linkedin, order },
+        data: dataPayload,
       });
     } else {
       await prisma.teamMember.create({
-        data: { name, role, bio, image, linkedin, order },
+        data: dataPayload,
       });
     }
 
