@@ -136,14 +136,14 @@ export default function PartnersClient({ initialPartners, initialInquiries }) {
       </div>
 
       {/* Search Input */}
-      <div className="relative max-w-sm">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+      <div className="relative flex-1 max-w-md">
+        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400 pointer-events-none" />
         <input
           type="text"
           placeholder="Search..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full pl-9 pr-4 py-2 text-sm rounded-lg border border-input bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="block w-full rounded-md border border-zinc-200 bg-white h-11 pl-10 pr-4 text-sm text-zinc-900 focus:border-blue-500 focus:outline-none dark:border-zinc-800 dark:bg-zinc-900 dark:text-white transition-colors"
         />
       </div>
 
@@ -204,28 +204,28 @@ export default function PartnersClient({ initialPartners, initialInquiries }) {
 
       {/* TAB 2: Form Inquiries Table */}
       {activeTab === "inquiries" && (
-        <div className="bg-card rounded-2xl border border-border overflow-hidden shadow-sm">
+        <div className="rounded-md border border-zinc-200 bg-white overflow-hidden shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm text-foreground">
-              <thead className="bg-muted/50 border-b border-border text-xs uppercase font-semibold text-muted-foreground">
+            <table className="w-full text-left text-sm text-zinc-500 dark:text-zinc-400">
+              <thead className="bg-zinc-50 text-xs font-bold uppercase tracking-wider text-zinc-400 dark:bg-zinc-950">
                 <tr>
-                  <th className="px-6 py-3.5">Date</th>
-                  <th className="px-6 py-3.5">Contact Email</th>
-                  <th className="px-6 py-3.5">Inquiry Details</th>
-                  <th className="px-6 py-3.5 text-right">Actions</th>
+                  <th className="px-6 py-4">Date</th>
+                  <th className="px-6 py-4">Contact Email</th>
+                  <th className="px-6 py-4">Inquiry Details</th>
+                  <th className="px-6 py-4 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-border">
+              <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
                 {filteredInquiries.length === 0 ? (
                   <tr>
-                    <td colSpan={4} className="px-6 py-12 text-center text-muted-foreground">
+                    <td colSpan={4} className="px-6 py-12 text-center text-zinc-400">
                       <Mail className="h-8 w-8 mx-auto mb-2 opacity-40" />
                       No corporate partnership inquiries found.
                     </td>
                   </tr>
                 ) : (
                   filteredInquiries.map((inq) => (
-                    <tr key={inq.id} className="hover:bg-muted/30 transition-colors">
+                    <tr key={inq.id} className="hover:bg-zinc-50/50 dark:hover:bg-zinc-950/20 transition-colors">
                       <td className="px-6 py-4 whitespace-nowrap text-xs text-muted-foreground">
                         {new Date(inq.createdAt).toLocaleDateString()}
                       </td>

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Search, ShieldAlert, Trash2, Calendar, Eye, Filter } from "lucide-react";
 import ConfirmDeleteModal from "@/components/ConfirmDeleteModal";
+import CustomSelect from "@/components/CustomSelect";
 import { deleteAuditLogAction } from "@/app/actions/contact";
 import { toast } from "sonner";
 
@@ -52,65 +53,60 @@ export default function AuditLogsClient({ initialLogs }) {
   return (
     <div className="space-y-6">
       {/* Search and Filters */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-card p-4 rounded-xl border border-border shadow-sm md:bg-transparent md:p-0 md:border-0 md:shadow-none">
-        <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
-          <div className="relative w-full sm:w-72">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+      <div className="flex flex-col md:flex-row gap-4 md:items-center justify-between">
+        <div className="flex flex-col sm:flex-row items-center gap-3 flex-1">
+          <div className="relative flex-1 w-full">
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400 pointer-events-none" />
             <input
               type="text"
               placeholder="Search logs..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 text-sm rounded-lg border border-input bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="block w-full rounded-md border border-zinc-200 bg-white h-11 pl-10 pr-4 text-sm text-zinc-900 focus:border-blue-500 focus:outline-none dark:border-zinc-800 dark:bg-zinc-900 dark:text-white transition-colors"
             />
           </div>
 
-          <div className="flex items-center gap-2 w-full sm:w-auto">
-            <Filter className="h-4 w-4 text-muted-foreground shrink-0" />
-            <select
-              value={actionFilter}
-              onChange={(e) => setActionFilter(e.target.value)}
-              className="w-full sm:w-auto px-3 py-2 text-sm rounded-lg border border-input bg-background text-foreground"
-            >
-              <option value="ALL">All Actions</option>
-              {actionsList.map((act) => (
-                <option key={act} value={act}>
-                  {act}
-                </option>
-              ))}
-            </select>
-          </div>
+          <CustomSelect
+            value={actionFilter}
+            onChange={setActionFilter}
+            options={[
+              { value: "ALL", label: "All Actions" },
+              ...actionsList.map((act) => ({ value: act, label: act })),
+            ]}
+            placeholder="Filter Action..."
+            className="w-full sm:w-56"
+          />
         </div>
 
-        <div className="text-xs font-medium text-muted-foreground">
-          Total Logs: <span className="font-bold text-foreground">{logs.length}</span>
+        <div className="text-xs font-semibold text-zinc-500 dark:text-zinc-400">
+          Total Logs: <span className="font-bold text-zinc-900 dark:text-white">{logs.length}</span>
         </div>
       </div>
 
       {/* Logs Table */}
-      <div className="bg-card rounded-2xl border border-border overflow-hidden shadow-sm">
+      <div className="rounded-md border border-zinc-200 bg-white overflow-hidden shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm text-foreground">
-            <thead className="bg-muted/50 border-b border-border text-xs uppercase font-semibold text-muted-foreground">
+          <table className="w-full text-left text-sm text-zinc-500 dark:text-zinc-400">
+            <thead className="bg-zinc-50 text-xs font-bold uppercase tracking-wider text-zinc-400 dark:bg-zinc-950">
               <tr>
-                <th className="px-6 py-3.5">Timestamp</th>
-                <th className="px-6 py-3.5">Action</th>
-                <th className="px-6 py-3.5">User Email</th>
-                <th className="px-6 py-3.5">Details</th>
-                <th className="px-6 py-3.5 text-right">Actions</th>
+                <th className="px-6 py-4">Timestamp</th>
+                <th className="px-6 py-4">Action</th>
+                <th className="px-6 py-4">User Email</th>
+                <th className="px-6 py-4">Details</th>
+                <th className="px-6 py-4 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-border">
+            <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
               {filteredLogs.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-6 py-12 text-center text-muted-foreground">
+                  <td colSpan={5} className="px-6 py-12 text-center text-zinc-400">
                     <ShieldAlert className="h-8 w-8 mx-auto mb-2 opacity-40" />
                     No audit log entries found.
                   </td>
                 </tr>
               ) : (
                 filteredLogs.map((log) => (
-                  <tr key={log.id} className="hover:bg-muted/30 transition-colors">
+                  <tr key={log.id} className="hover:bg-zinc-50/50 dark:hover:bg-zinc-950/20 transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap text-xs text-muted-foreground">
                       {new Date(log.createdAt).toLocaleString()}
                     </td>

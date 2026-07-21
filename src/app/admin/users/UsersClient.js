@@ -68,50 +68,50 @@ export default function UsersClient({ initialUsers }) {
   return (
     <div className="space-y-6">
       {/* Search Header */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-card p-4 rounded-xl border border-border shadow-sm md:bg-transparent md:p-0 md:border-0 md:shadow-none">
-        <div className="relative w-full sm:w-80">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+      <div className="flex flex-col md:flex-row gap-4 md:items-center justify-between">
+        <div className="relative flex-1 max-w-md">
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400 pointer-events-none" />
           <input
             type="text"
             placeholder="Search by name or email..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 text-sm rounded-lg border border-input bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="block w-full rounded-md border border-zinc-200 bg-white h-11 pl-10 pr-4 text-sm text-zinc-900 focus:border-blue-500 focus:outline-none dark:border-zinc-800 dark:bg-zinc-900 dark:text-white transition-colors"
           />
         </div>
 
         <button
           onClick={() => setIsModalOpen(true)}
-          className="px-4 py-2 rounded-xl bg-blue-600 text-white font-semibold text-xs hover:bg-blue-700 transition-colors inline-flex items-center gap-2 cursor-pointer"
+          className="px-4 py-2 rounded-md bg-blue-600 text-white font-semibold text-xs hover:bg-blue-700 transition-colors inline-flex items-center gap-2 cursor-pointer"
         >
           <Plus className="h-4 w-4" /> Add New User / Admin
         </button>
       </div>
 
       {/* Users Table */}
-      <div className="bg-card rounded-2xl border border-border overflow-hidden shadow-sm">
+      <div className="rounded-md border border-zinc-200 bg-white overflow-hidden shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm text-foreground">
-            <thead className="bg-muted/50 border-b border-border text-xs uppercase font-semibold text-muted-foreground">
+          <table className="w-full text-left text-sm text-zinc-500 dark:text-zinc-400">
+            <thead className="bg-zinc-50 text-xs font-bold uppercase tracking-wider text-zinc-400 dark:bg-zinc-950">
               <tr>
-                <th className="px-6 py-3.5">User</th>
-                <th className="px-6 py-3.5">Email</th>
-                <th className="px-6 py-3.5">Role</th>
-                <th className="px-6 py-3.5">Joined Date</th>
-                <th className="px-6 py-3.5 text-right">Actions</th>
+                <th className="px-6 py-4">User</th>
+                <th className="px-6 py-4">Email</th>
+                <th className="px-6 py-4">Role</th>
+                <th className="px-6 py-4">Joined Date</th>
+                <th className="px-6 py-4 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-border">
+            <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
               {filteredUsers.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-6 py-12 text-center text-muted-foreground">
+                  <td colSpan={5} className="px-6 py-12 text-center text-zinc-400">
                     <UserCog className="h-8 w-8 mx-auto mb-2 opacity-40" />
                     No user accounts found.
                   </td>
                 </tr>
               ) : (
                 filteredUsers.map((user) => (
-                  <tr key={user.id} className="hover:bg-muted/30 transition-colors">
+                  <tr key={user.id} className="hover:bg-zinc-50/50 dark:hover:bg-zinc-950/20 transition-colors">
                     <td className="px-6 py-4 font-bold text-foreground">
                       <div className="flex items-center gap-2.5">
                         <div className="h-8 w-8 rounded-full bg-blue-100 dark:bg-blue-950 text-blue-600 dark:text-blue-400 font-extrabold flex items-center justify-center text-xs">
