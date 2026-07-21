@@ -5,9 +5,16 @@ import { Search, Eye } from "lucide-react";
 import CustomSelect from "@/components/CustomSelect";
 import Link from "next/link";
 
-export default function DonationsManager({ initialDonations = [] }) {
+export default function DonationsManager({ initialDonations = [], campaigns = [] }) {
   const [donations, setDonations] = useState(initialDonations);
   const [search, setSearch] = useState("");
+  const [selectedCampaign, setSelectedCampaign] = useState("ALL");
+
+  const campaignOptions = [
+    { value: "ALL", label: "All Campaigns" },
+    { value: "GENERAL", label: "General Fund" },
+    ...campaigns.map((c) => ({ value: c.id, label: c.title })),
+  ];
 
   // Filter logic
   const filteredDonations = donations.filter((d) => {
@@ -16,7 +23,13 @@ export default function DonationsManager({ initialDonations = [] }) {
       (d.donorEmail || "").toLowerCase().includes(search.toLowerCase()) ||
       d.reference.toLowerCase().includes(search.toLowerCase());
 
-    return matchesSearch;
+    const matchesCampaign =
+      selectedCampaign === "ALL" ||
+      (selectedCampaign === "GENERAL" && !d.campaignId) ||
+      d.campaignId === selectedCampaign ||
+      d.campaign?.title === selectedCampaign;
+
+    return matchesSearch && matchesCampaign;
   });
 
   return (
@@ -34,6 +47,15 @@ export default function DonationsManager({ initialDonations = [] }) {
             className="block w-full rounded-md border border-zinc-200 bg-white h-11 pl-10 pr-4 text-sm text-zinc-900 focus:border-blue-500 focus:outline-none dark:border-zinc-800 dark:bg-zinc-900 dark:text-white transition-colors"
           />
         </div>
+
+        {/* Campaign Filter */}
+        <CustomSelect
+          value={selectedCampaign}
+          onChange={setSelectedCampaign}
+          options={campaignOptions}
+          placeholder="Filter Campaign..."
+          className="w-full md:w-56"
+        />
       </div>
 
       {/* Donations Table */}

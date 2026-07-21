@@ -128,7 +128,7 @@ export default function PartnersClient({ initialPartners, initialInquiries }) {
         {activeTab === "logos" && (
           <button
             onClick={openAddModal}
-            className="px-4 py-2 rounded-xl bg-blue-600 text-white font-semibold text-xs hover:bg-blue-700 transition-colors inline-flex items-center gap-2 cursor-pointer"
+            className="px-4 py-2 rounded-md bg-blue-600 text-white font-semibold text-xs hover:bg-blue-700 transition-colors inline-flex items-center gap-2 cursor-pointer"
           >
             <Plus className="h-4 w-4" /> Add Partner Logo
           </button>

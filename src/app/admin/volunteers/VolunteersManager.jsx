@@ -2,26 +2,49 @@
 
 import { useState } from "react";
 import { Search, X, FileText } from "lucide-react";
+import CustomSelect from "@/components/CustomSelect";
 
 export default function VolunteersManager({ initialVolunteers = [] }) {
   const [volunteers, setVolunteers] = useState(initialVolunteers);
   const [search, setSearch] = useState("");
+  const [selectedSkill, setSelectedSkill] = useState("ALL");
   const [selectedMotivation, setSelectedMotivation] = useState(null);
 
-  // Filter application list by search
+  // Extract unique skills for dropdown options
+  const allSkillsSet = new Set();
+  initialVolunteers.forEach((v) => {
+    if (v.skills) {
+      v.skills.split(",").forEach((s) => {
+        const trimmed = s.trim();
+        if (trimmed) allSkillsSet.add(trimmed);
+      });
+    }
+  });
+
+  const skillOptions = [
+    { value: "ALL", label: "All Skills & Talents" },
+    ...Array.from(allSkillsSet).map((s) => ({ value: s, label: s })),
+  ];
+
+  // Filter application list by search and skills
   const filteredVolunteers = volunteers.filter((v) => {
-    return (
+    const matchesSearch =
       v.name.toLowerCase().includes(search.toLowerCase()) ||
       v.email.toLowerCase().includes(search.toLowerCase()) ||
       v.phone.toLowerCase().includes(search.toLowerCase()) ||
       v.location.toLowerCase().includes(search.toLowerCase()) ||
-      v.skills.toLowerCase().includes(search.toLowerCase())
-    );
+      v.skills.toLowerCase().includes(search.toLowerCase());
+
+    const matchesSkill =
+      selectedSkill === "ALL" ||
+      v.skills.toLowerCase().includes(selectedSkill.toLowerCase());
+
+    return matchesSearch && matchesSkill;
   });
 
   return (
     <div className="space-y-6">
-      {/* Search */}
+      {/* Search & Skill Filter */}
       <div className="flex flex-col md:flex-row gap-4 md:items-center">
         <div className="relative flex-1">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400 pointer-events-none" />
@@ -33,6 +56,15 @@ export default function VolunteersManager({ initialVolunteers = [] }) {
             className="block w-full rounded-md border border-zinc-200 bg-white h-11 pl-10 pr-4 text-sm text-zinc-900 focus:border-blue-500 focus:outline-none dark:border-zinc-800 dark:bg-zinc-900 dark:text-white transition-colors"
           />
         </div>
+
+        {/* Skill / Talent Filter */}
+        <CustomSelect
+          value={selectedSkill}
+          onChange={setSelectedSkill}
+          options={skillOptions}
+          placeholder="Filter Skill..."
+          className="w-full md:w-56"
+        />
       </div>
 
       {/* Applications Grid/Table */}

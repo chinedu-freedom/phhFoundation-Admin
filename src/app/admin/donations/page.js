@@ -6,14 +6,20 @@ export const metadata = {
 };
 
 export default async function AdminDonationsPage() {
-  const rawDonations = await prisma.donation.findMany({
-    orderBy: { createdAt: "desc" },
-    include: {
-      campaign: {
-        select: { title: true },
+  const [rawDonations, rawCampaigns] = await Promise.all([
+    prisma.donation.findMany({
+      orderBy: { createdAt: "desc" },
+      include: {
+        campaign: {
+          select: { id: true, title: true },
+        },
       },
-    },
-  });
+    }),
+    prisma.campaign.findMany({
+      select: { id: true, title: true },
+    }),
+  ]);
+
   const donations = rawDonations.map((d) => ({
     ...d,
     createdAt: d.createdAt instanceof Date ? d.createdAt.toISOString() : d.createdAt,
@@ -30,7 +36,7 @@ export default async function AdminDonationsPage() {
         </p>
       </div>
 
-      <DonationsManager initialDonations={donations} />
+      <DonationsManager initialDonations={donations} campaigns={rawCampaigns} />
     </div>
   );
 }
