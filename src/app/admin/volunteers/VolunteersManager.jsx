@@ -109,7 +109,7 @@ export default function VolunteersManager({ initialVolunteers = [] }) {
                     {v.motivation ? (
                       <button
                         onClick={() => setSelectedMotivation(v)}
-                        className="inline-flex items-center gap-1 text-xs font-bold text-blue-600 hover:text-blue-700 dark:text-blue-400"
+                        className="inline-flex cursor-pointer items-center gap-1 text-xs font-bold text-blue-600 hover:text-blue-700 dark:text-blue-400"
                       >
                         <FileText className="h-4 w-4" /> View
                       </button>
@@ -141,7 +141,7 @@ export default function VolunteersManager({ initialVolunteers = [] }) {
               </h3>
               <button
                 onClick={() => setSelectedMotivation(null)}
-                className="rounded-lg p-1 hover:bg-zinc-50 dark:hover:bg-zinc-950"
+                className="rounded-lg cursor-pointer p-1 hover:bg-zinc-50 dark:hover:bg-zinc-950"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -159,7 +159,7 @@ export default function VolunteersManager({ initialVolunteers = [] }) {
             <div className="mt-6 flex justify-end">
               <button
                 onClick={() => setSelectedMotivation(null)}
-                className="rounded-xl bg-zinc-900 px-4 py-2 text-xs font-semibold text-white hover:bg-zinc-800 dark:bg-white dark:text-black dark:hover:bg-zinc-100"
+                className="rounded-xl cursor-pointer bg-zinc-900 px-4 py-2 text-xs font-semibold text-white hover:bg-zinc-800 dark:bg-white dark:text-black dark:hover:bg-zinc-100"
               >
                 Close
               </button>

@@ -52,7 +52,7 @@ export default function AuditLogsClient({ initialLogs }) {
   return (
     <div className="space-y-6">
       {/* Search and Filters */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-card p-4 rounded-xl border border-border shadow-sm">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-card p-4 rounded-xl border border-border shadow-sm md:bg-transparent md:p-0 md:border-0 md:shadow-none">
         <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
           <div className="relative w-full sm:w-72">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
