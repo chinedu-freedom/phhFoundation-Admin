@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Plus, Trash2, Edit, UserCheck, Globe, ExternalLink, Search, Mail, Phone } from "lucide-react";
 import ImagePicker from "@/components/ImagePicker";
 import ConfirmDeleteModal from "@/components/ConfirmDeleteModal";
+import Pagination from "@/components/Pagination";
 import { upsertTeamMemberAction, deleteTeamMemberAction } from "@/app/actions/team";
 import { toast } from "sonner";
 
@@ -24,6 +25,8 @@ const Facebook = ({ className }) => (
 export default function TeamClient({ initialMembers }) {
   const [members, setMembers] = useState(initialMembers);
   const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 8;
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingMember, setEditingMember] = useState(null);
@@ -40,6 +43,22 @@ export default function TeamClient({ initialMembers }) {
         m.role.toLowerCase().includes(searchTerm.toLowerCase())
     )
     .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+
+  const totalItems = filtered.length;
+  const totalPages = Math.ceil(totalItems / pageSize) || 1;
+  const paginatedMembers = filtered.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
+
+  const paginationMeta = {
+    currentPage,
+    totalPages,
+    totalItems,
+    pageSize,
+    hasNextPage: currentPage < totalPages,
+    hasPrevPage: currentPage > 1,
+  };
 
   const openAddModal = () => {
     setEditingMember({ order: members.length + 1 });
@@ -112,114 +131,117 @@ export default function TeamClient({ initialMembers }) {
         </button>
       </div>
 
-      {/* Grid of Team Members */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {filtered.length === 0 ? (
-          <div className="col-span-full py-12 text-center text-muted-foreground bg-card rounded-2xl border border-border">
-            <UserCheck className="h-8 w-8 mx-auto mb-2 opacity-40" />
-            No team members added yet.
-          </div>
-        ) : (
-          filtered.map((member) => (
-            <div
-              key={member.id}
-              className="bg-card rounded-2xl border border-border p-5 shadow-sm space-y-4 flex flex-col justify-between"
-            >
-              <div className="space-y-3">
-                <div className="relative h-48 w-full rounded-xl bg-muted overflow-hidden border border-border">
-                  {member.image ? (
-                    <img
-                      src={member.image}
-                      alt={member.name}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-blue-100 dark:bg-blue-950 text-blue-600 dark:text-blue-400 font-extrabold text-2xl">
-                      {member.name.charAt(0)}
-                    </div>
-                  )}
-                  <span className="absolute top-2.5 right-2.5 text-xs px-2.5 py-0.5 rounded-full bg-blue-600 text-white font-extrabold shadow-md border border-white/20">
-                    Order {member.order}
-                  </span>
-                </div>
-
-                <div>
-                  <h3 className="font-bold text-base text-foreground leading-snug">{member.name}</h3>
-                  <p className="text-xs font-semibold text-blue-600 dark:text-blue-400 mt-1">
-                    {member.role}
-                  </p>
-                </div>
-
-                {member.bio && (
-                  <p className="text-xs text-muted-foreground line-clamp-3 leading-relaxed">
-                    {member.bio}
-                  </p>
-                )}
-
-                {/* Contact and Social Media Handles */}
-                <div className="flex flex-wrap items-center gap-3 pt-2 text-xs text-muted-foreground border-t border-border/60">
-                  {member.email && (
-                    <a
-                      href={`mailto:${member.email}`}
-                      className="hover:text-blue-600 transition-colors p-1 rounded hover:bg-muted"
-                      title={member.email}
-                    >
-                      <Mail className="h-4 w-4" />
-                    </a>
-                  )}
-                  {(member.whatsapp || member.phone) && (
-                    <a
-                      href={`https://wa.me/${(member.whatsapp || member.phone).replace(/[^0-9]/g, "")}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="hover:text-emerald-600 transition-colors p-1 rounded hover:bg-muted"
-                      title={member.whatsapp || member.phone}
-                    >
-                      <Phone className="h-4 w-4" />
-                    </a>
-                  )}
-                  {member.facebook && (
-                    <a
-                      href={member.facebook}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="hover:text-blue-600 transition-colors p-1 rounded hover:bg-muted"
-                      title="Facebook Profile"
-                    >
-                      <Facebook className="h-4 w-4" />
-                    </a>
-                  )}
-                  {member.linkedin && (
-                    <a
-                      href={member.linkedin}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="hover:text-blue-600 transition-colors p-1 rounded hover:bg-muted"
-                      title="LinkedIn Profile"
-                    >
-                      <Globe className="h-4 w-4" />
-                    </a>
-                  )}
-                </div>
-              </div>
-
-              <div className="flex justify-end gap-2 pt-3 border-t border-border">
-                <button
-                  onClick={() => openEditModal(member)}
-                  className="p-1.5 rounded-lg border border-border text-foreground hover:bg-muted transition-colors cursor-pointer"
-                >
-                  <Edit className="h-3.5 w-3.5" />
-                </button>
-                <button
-                  onClick={() => setDeletingId(member.id)}
-                  className="p-1.5 rounded-lg border border-red-500/20 text-red-500 hover:bg-red-500/10 transition-colors cursor-pointer"
-                >
-                  <Trash2 className="h-3.5 w-3.5" />
-                </button>
-              </div>
+      {/* Team Members Grid */}
+      <div className="space-y-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {paginatedMembers.length === 0 ? (
+            <div className="col-span-full py-12 text-center text-muted-foreground bg-card rounded-2xl border border-border">
+              <UserCheck className="h-8 w-8 mx-auto mb-2 opacity-40" />
+              No team members added yet.
             </div>
-          ))
-        )}
+          ) : (
+            paginatedMembers.map((member) => (
+              <div
+                key={member.id}
+                className="bg-card rounded-2xl border border-border p-5 shadow-sm space-y-4 flex flex-col justify-between"
+              >
+                <div className="space-y-3">
+                  <div className="relative h-48 w-full rounded-xl bg-muted overflow-hidden border border-border">
+                    {member.image ? (
+                      <img
+                        src={member.image}
+                        alt={member.name}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-blue-100 dark:bg-blue-950 text-blue-600 dark:text-blue-400 font-extrabold text-2xl">
+                        {member.name.charAt(0)}
+                      </div>
+                    )}
+                    <span className="absolute top-2.5 right-2.5 text-xs px-2.5 py-0.5 rounded-full bg-blue-600 text-white font-extrabold shadow-md border border-white/20">
+                      Order {member.order}
+                    </span>
+                  </div>
+
+                  <div>
+                    <h3 className="font-bold text-base text-foreground leading-snug">{member.name}</h3>
+                    <p className="text-xs font-semibold text-blue-600 dark:text-blue-400 mt-1">
+                      {member.role}
+                    </p>
+                  </div>
+
+                  {member.bio && (
+                    <p className="text-xs text-muted-foreground line-clamp-3 leading-relaxed">
+                      {member.bio}
+                    </p>
+                  )}
+
+                  {/* Contact and Social Media Handles */}
+                  <div className="flex flex-wrap items-center gap-3 pt-2 text-xs text-muted-foreground border-t border-border/60">
+                    {member.email && (
+                      <a
+                        href={`mailto:${member.email}`}
+                        className="hover:text-blue-600 transition-colors p-1 rounded hover:bg-muted"
+                        title={member.email}
+                      >
+                        <Mail className="h-4 w-4" />
+                      </a>
+                    )}
+                    {(member.whatsapp || member.phone) && (
+                      <a
+                        href={`https://wa.me/${(member.whatsapp || member.phone).replace(/[^0-9]/g, "")}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="hover:text-emerald-600 transition-colors p-1 rounded hover:bg-muted"
+                        title={member.whatsapp || member.phone}
+                      >
+                        <Phone className="h-4 w-4" />
+                      </a>
+                    )}
+                    {member.facebook && (
+                      <a
+                        href={member.facebook}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="hover:text-blue-600 transition-colors p-1 rounded hover:bg-muted"
+                        title="Facebook Profile"
+                      >
+                        <Facebook className="h-4 w-4" />
+                      </a>
+                    )}
+                    {member.linkedin && (
+                      <a
+                        href={member.linkedin}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="hover:text-blue-600 transition-colors p-1 rounded hover:bg-muted"
+                        title="LinkedIn Profile"
+                      >
+                        <Globe className="h-4 w-4" />
+                      </a>
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex justify-end gap-2 pt-3 border-t border-border">
+                  <button
+                    onClick={() => openEditModal(member)}
+                    className="p-1.5 rounded-lg border border-border text-foreground hover:bg-muted transition-colors cursor-pointer"
+                  >
+                    <Edit className="h-3.5 w-3.5" />
+                  </button>
+                  <button
+                    onClick={() => setDeletingId(member.id)}
+                    className="p-1.5 rounded-lg border border-red-500/20 text-red-500 hover:bg-red-500/10 transition-colors cursor-pointer"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+        <Pagination meta={paginationMeta} onPageChange={setCurrentPage} />
       </div>
 
       {/* Add/Edit Modal */}

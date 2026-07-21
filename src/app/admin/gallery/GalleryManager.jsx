@@ -9,6 +9,7 @@ import Image from "next/image";
 import CustomSelect from "@/components/CustomSelect";
 import ImagePicker from "@/components/ImagePicker";
 import ConfirmDeleteModal from "@/components/ConfirmDeleteModal";
+import Pagination from "@/components/Pagination";
 
 export default function GalleryManager({ initialImages = [] }) {
   const router = useRouter();
@@ -18,6 +19,8 @@ export default function GalleryManager({ initialImages = [] }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState("All");
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 8;
 
   // Sync props to state
   useEffect(() => {
@@ -107,6 +110,22 @@ export default function GalleryManager({ initialImages = [] }) {
     return activeTab === "All" || img.album === activeTab;
   });
 
+  const totalItems = filteredImages.length;
+  const totalPages = Math.ceil(totalItems / pageSize) || 1;
+  const paginatedImages = filteredImages.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
+
+  const paginationMeta = {
+    currentPage,
+    totalPages,
+    totalItems,
+    pageSize,
+    hasNextPage: currentPage < totalPages,
+    hasPrevPage: currentPage > 1,
+  };
+
   return (
     <div className="space-y-8">
       {/* Header controls */}
@@ -133,7 +152,10 @@ export default function GalleryManager({ initialImages = [] }) {
           <Filter className="h-3.5 w-3.5" /> Filter Album:
         </span>
         <button
-          onClick={() => setActiveTab("All")}
+          onClick={() => {
+            setActiveTab("All");
+            setCurrentPage(1);
+          }}
           className={`rounded-lg px-4 py-2 text-xs font-bold transition-all cursor-pointer ${
             activeTab === "All"
               ? "bg-blue-600 text-white shadow-sm"
@@ -147,7 +169,10 @@ export default function GalleryManager({ initialImages = [] }) {
           return (
             <button
               key={alb}
-              onClick={() => setActiveTab(alb)}
+              onClick={() => {
+                setActiveTab(alb);
+                setCurrentPage(1);
+              }}
               className={`rounded-lg px-4 py-2 text-xs font-bold transition-all cursor-pointer ${
                 activeTab === alb
                   ? "bg-blue-600 text-white shadow-sm"
@@ -163,51 +188,54 @@ export default function GalleryManager({ initialImages = [] }) {
 
 
       {/* Grid List */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
-        {filteredImages.map((img) => (
-          <div
-            key={img.id}
-            className="group relative aspect-square rounded-2xl overflow-hidden border border-border bg-muted dark:bg-zinc-950 shadow-sm"
-          >
-            <Image
-              src={img.url}
-              alt={img.caption || "Gallery item"}
-              fill
-              className="object-cover group-hover:scale-102 transition-transform duration-300"
-            />
-            {/* Hover overlay details */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 p-4 flex flex-col justify-between">
-              <div className="flex justify-end">
-                <button
-                  onClick={() => {
-                    setImageToDelete(img.id);
-                    setDeleteModalOpen(true);
-                  }}
-                  className="rounded-lg bg-red-600 p-2 text-white hover:bg-red-700 transition-colors shadow cursor-pointer"
-                >
-                  <Trash className="h-4 w-4" />
-                </button>
-              </div>
+      <div className="space-y-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
+          {paginatedImages.map((img) => (
+            <div
+              key={img.id}
+              className="group relative aspect-square rounded-2xl overflow-hidden border border-border bg-muted dark:bg-zinc-950 shadow-sm"
+            >
+              <Image
+                src={img.url}
+                alt={img.caption || "Gallery item"}
+                fill
+                className="object-cover group-hover:scale-102 transition-transform duration-300"
+              />
+              {/* Hover overlay details */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 p-4 flex flex-col justify-between">
+                <div className="flex justify-end">
+                  <button
+                    onClick={() => {
+                      setImageToDelete(img.id);
+                      setDeleteModalOpen(true);
+                    }}
+                    className="rounded-lg bg-red-600 p-2 text-white hover:bg-red-700 transition-colors shadow cursor-pointer"
+                  >
+                    <Trash className="h-4 w-4" />
+                  </button>
+                </div>
 
-              <div>
-                <span className="inline-block rounded bg-blue-650 px-2 py-0.5 text-xxs font-bold text-white uppercase tracking-wider mb-1">
-                  {img.album}
-                </span>
-                <p className="text-xs text-white line-clamp-2 leading-relaxed">
-                  {img.caption || "No caption provided"}
-                </p>
+                <div>
+                  <span className="inline-block rounded bg-blue-650 px-2 py-0.5 text-xxs font-bold text-white uppercase tracking-wider mb-1">
+                    {img.album}
+                  </span>
+                  <p className="text-xs text-white line-clamp-2 leading-relaxed">
+                    {img.caption || "No caption provided"}
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          ))}
 
-        {filteredImages.length === 0 && (
-          <div className="col-span-full py-16 text-center text-zinc-400 dark:text-zinc-550 flex flex-col items-center justify-center gap-2">
-            <ImageIcon className="h-10 w-10 text-muted-foreground/30" />
-            <p className="text-sm font-semibold">No pictures found in this album.</p>
-            <p className="text-xs text-muted-foreground">Click 'Add Photo' to upload pictures for {activeTab === "All" ? "any album" : activeTab}.</p>
-          </div>
-        )}
+          {filteredImages.length === 0 && (
+            <div className="col-span-full py-16 text-center text-zinc-400 dark:text-zinc-550 flex flex-col items-center justify-center gap-2">
+              <ImageIcon className="h-10 w-10 text-muted-foreground/30" />
+              <p className="text-sm font-semibold">No pictures found in this album.</p>
+              <p className="text-xs text-muted-foreground">Click 'Add Photo' to upload pictures for {activeTab === "All" ? "any album" : activeTab}.</p>
+            </div>
+          )}
+        </div>
+        <Pagination meta={paginationMeta} onPageChange={setCurrentPage} />
       </div>
 
       {/* Add Photo Modal */}

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Search, ShieldAlert, Trash2, Calendar, Eye, Filter } from "lucide-react";
 import ConfirmDeleteModal from "@/components/ConfirmDeleteModal";
 import CustomSelect from "@/components/CustomSelect";
+import Pagination from "@/components/Pagination";
 import { deleteAuditLogAction } from "@/app/actions/contact";
 import { toast } from "sonner";
 
@@ -14,6 +15,8 @@ export default function AuditLogsClient({ initialLogs }) {
   const [selectedLog, setSelectedLog] = useState(null);
   const [deletingId, setDeletingId] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 10;
 
   const actionsList = Array.from(new Set(logs.map((l) => l.action)));
 
@@ -27,6 +30,22 @@ export default function AuditLogsClient({ initialLogs }) {
     const matchesAction = actionFilter === "ALL" || l.action === actionFilter;
     return matchesSearch && matchesAction;
   });
+
+  const totalItems = filteredLogs.length;
+  const totalPages = Math.ceil(totalItems / pageSize) || 1;
+  const paginatedLogs = filteredLogs.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
+
+  const paginationMeta = {
+    currentPage,
+    totalPages,
+    totalItems,
+    pageSize,
+    hasNextPage: currentPage < totalPages,
+    hasPrevPage: currentPage > 1,
+  };
 
   const handleDelete = async () => {
     if (!deletingId) return;
@@ -61,14 +80,20 @@ export default function AuditLogsClient({ initialLogs }) {
               type="text"
               placeholder="Search logs..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setCurrentPage(1);
+              }}
               className="block w-full rounded-md border border-zinc-200 bg-white h-11 pl-10 pr-4 text-sm text-zinc-900 focus:border-blue-500 focus:outline-none dark:border-zinc-800 dark:bg-zinc-900 dark:text-white transition-colors"
             />
           </div>
 
           <CustomSelect
             value={actionFilter}
-            onChange={setActionFilter}
+            onChange={(val) => {
+              setActionFilter(val);
+              setCurrentPage(1);
+            }}
             options={[
               { value: "ALL", label: "All Actions" },
               ...actionsList.map((act) => ({ value: act, label: act })),
@@ -97,7 +122,7 @@ export default function AuditLogsClient({ initialLogs }) {
               </tr>
             </thead>
             <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
-              {filteredLogs.length === 0 ? (
+              {paginatedLogs.length === 0 ? (
                 <tr>
                   <td colSpan={5} className="px-6 py-12 text-center text-zinc-400">
                     <ShieldAlert className="h-8 w-8 mx-auto mb-2 opacity-40" />
@@ -105,7 +130,7 @@ export default function AuditLogsClient({ initialLogs }) {
                   </td>
                 </tr>
               ) : (
-                filteredLogs.map((log) => (
+                paginatedLogs.map((log) => (
                   <tr key={log.id} className="hover:bg-zinc-50/50 dark:hover:bg-zinc-950/20 transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap text-xs text-muted-foreground">
                       {new Date(log.createdAt).toLocaleString()}
@@ -148,6 +173,7 @@ export default function AuditLogsClient({ initialLogs }) {
             </tbody>
           </table>
         </div>
+        <Pagination meta={paginationMeta} onPageChange={setCurrentPage} />
       </div>
 
       {/* Log Detail Modal */}

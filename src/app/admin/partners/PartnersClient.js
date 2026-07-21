@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Plus, Trash2, Edit, ExternalLink, Building2, FileText, Mail, Search } from "lucide-react";
 import ImagePicker from "@/components/ImagePicker";
 import ConfirmDeleteModal from "@/components/ConfirmDeleteModal";
+import Pagination from "@/components/Pagination";
 import { upsertPartnerAction, deletePartnerAction } from "@/app/actions/partner";
 import { deleteAuditLogAction } from "@/app/actions/contact";
 import { toast } from "sonner";
@@ -13,6 +14,8 @@ export default function PartnersClient({ initialPartners, initialInquiries }) {
   const [partners, setPartners] = useState(initialPartners);
   const [inquiries, setInquiries] = useState(initialInquiries);
   const [searchTerm, setSearchTerm] = useState("");
+  const [inquiriesPage, setInquiriesPage] = useState(1);
+  const pageSize = 10;
 
   // Modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -34,6 +37,22 @@ export default function PartnersClient({ initialPartners, initialInquiries }) {
       i.userEmail?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       i.details?.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const totalInquiries = filteredInquiries.length;
+  const totalInquiryPages = Math.ceil(totalInquiries / pageSize) || 1;
+  const paginatedInquiries = filteredInquiries.slice(
+    (inquiriesPage - 1) * pageSize,
+    inquiriesPage * pageSize
+  );
+
+  const inquiriesPaginationMeta = {
+    currentPage: inquiriesPage,
+    totalPages: totalInquiryPages,
+    totalItems: totalInquiries,
+    pageSize,
+    hasNextPage: inquiriesPage < totalInquiryPages,
+    hasPrevPage: inquiriesPage > 1,
+  };
 
   const openAddModal = () => {
     setEditingPartner(null);
@@ -216,7 +235,7 @@ export default function PartnersClient({ initialPartners, initialInquiries }) {
                 </tr>
               </thead>
               <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
-                {filteredInquiries.length === 0 ? (
+                {paginatedInquiries.length === 0 ? (
                   <tr>
                     <td colSpan={4} className="px-6 py-12 text-center text-zinc-400">
                       <Mail className="h-8 w-8 mx-auto mb-2 opacity-40" />
@@ -224,7 +243,7 @@ export default function PartnersClient({ initialPartners, initialInquiries }) {
                     </td>
                   </tr>
                 ) : (
-                  filteredInquiries.map((inq) => (
+                  paginatedInquiries.map((inq) => (
                     <tr key={inq.id} className="hover:bg-zinc-50/50 dark:hover:bg-zinc-950/20 transition-colors">
                       <td className="px-6 py-4 whitespace-nowrap text-xs text-muted-foreground">
                         {new Date(inq.createdAt).toLocaleDateString()}
@@ -251,6 +270,7 @@ export default function PartnersClient({ initialPartners, initialInquiries }) {
               </tbody>
             </table>
           </div>
+          <Pagination meta={inquiriesPaginationMeta} onPageChange={setInquiriesPage} />
         </div>
       )}
 

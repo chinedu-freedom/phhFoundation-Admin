@@ -3,12 +3,15 @@
 import { useState } from "react";
 import { Search, Eye } from "lucide-react";
 import CustomSelect from "@/components/CustomSelect";
+import Pagination from "@/components/Pagination";
 import Link from "next/link";
 
 export default function DonationsManager({ initialDonations = [], campaigns = [] }) {
   const [donations, setDonations] = useState(initialDonations);
   const [search, setSearch] = useState("");
   const [selectedCampaign, setSelectedCampaign] = useState("ALL");
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 10;
 
   const campaignOptions = [
     { value: "ALL", label: "All Campaigns" },
@@ -32,6 +35,22 @@ export default function DonationsManager({ initialDonations = [], campaigns = []
     return matchesSearch && matchesCampaign;
   });
 
+  const totalItems = filteredDonations.length;
+  const totalPages = Math.ceil(totalItems / pageSize) || 1;
+  const paginatedDonations = filteredDonations.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
+
+  const paginationMeta = {
+    currentPage,
+    totalPages,
+    totalItems,
+    pageSize,
+    hasNextPage: currentPage < totalPages,
+    hasPrevPage: currentPage > 1,
+  };
+
   return (
     <div className="space-y-6">
       {/* Search & Filters */}
@@ -43,7 +62,10 @@ export default function DonationsManager({ initialDonations = [], campaigns = []
             type="text"
             placeholder="Search by donor, email, or reference..."
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setCurrentPage(1);
+            }}
             className="block w-full rounded-md border border-zinc-200 bg-white h-11 pl-10 pr-4 text-sm text-zinc-900 focus:border-blue-500 focus:outline-none dark:border-zinc-800 dark:bg-zinc-900 dark:text-white transition-colors"
           />
         </div>
@@ -51,7 +73,10 @@ export default function DonationsManager({ initialDonations = [], campaigns = []
         {/* Campaign Filter */}
         <CustomSelect
           value={selectedCampaign}
-          onChange={setSelectedCampaign}
+          onChange={(val) => {
+            setSelectedCampaign(val);
+            setCurrentPage(1);
+          }}
           options={campaignOptions}
           placeholder="Filter Campaign..."
           className="w-full md:w-56 "
@@ -74,7 +99,7 @@ export default function DonationsManager({ initialDonations = [], campaigns = []
               </tr>
             </thead>
             <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
-              {filteredDonations.map((d) => (
+              {paginatedDonations.map((d) => (
                 <tr key={d.id} className="hover:bg-zinc-50/50 dark:hover:bg-zinc-950/20">
                   <td className="px-6 py-4 font-mono text-xs font-bold text-zinc-900 dark:text-white">
                     {d.reference}
@@ -128,6 +153,7 @@ export default function DonationsManager({ initialDonations = [], campaigns = []
             </tbody>
           </table>
         </div>
+        <Pagination meta={paginationMeta} onPageChange={setCurrentPage} />
       </div>
     </div>
   );

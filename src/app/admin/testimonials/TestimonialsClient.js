@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Plus, Trash2, Edit, Quote, ToggleLeft, ToggleRight, Search, User } from "lucide-react";
 import ImagePicker from "@/components/ImagePicker";
 import ConfirmDeleteModal from "@/components/ConfirmDeleteModal";
+import Pagination from "@/components/Pagination";
 import {
   upsertTestimonialAction,
   toggleTestimonialStatusAction,
@@ -14,6 +15,8 @@ import { toast } from "sonner";
 export default function TestimonialsClient({ initialTestimonials }) {
   const [testimonials, setTestimonials] = useState(initialTestimonials);
   const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 8;
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingTestimonial, setEditingTestimonial] = useState(null);
   const [image, setImage] = useState("");
@@ -29,6 +32,22 @@ export default function TestimonialsClient({ initialTestimonials }) {
       t.role.toLowerCase().includes(searchTerm.toLowerCase()) ||
       t.quote.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const totalItems = filtered.length;
+  const totalPages = Math.ceil(totalItems / pageSize) || 1;
+  const paginatedTestimonials = filtered.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
+
+  const paginationMeta = {
+    currentPage,
+    totalPages,
+    totalItems,
+    pageSize,
+    hasNextPage: currentPage < totalPages,
+    hasPrevPage: currentPage > 1,
+  };
 
   const openAddModal = () => {
     setEditingTestimonial(null);
@@ -117,81 +136,84 @@ export default function TestimonialsClient({ initialTestimonials }) {
       </div>
 
       {/* Testimonials Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filtered.length === 0 ? (
-          <div className="col-span-full py-12 text-center text-muted-foreground bg-card rounded-2xl border border-border">
-            <Quote className="h-8 w-8 mx-auto mb-2 opacity-40" />
-            No testimonials found.
-          </div>
-        ) : (
-          filtered.map((item) => (
-            <div
-              key={item.id}
-              className={`bg-card rounded-2xl border ${
-                item.status ? "border-border" : "border-amber-500/30 bg-amber-500/5"
-              } p-6 shadow-sm flex flex-col justify-between space-y-4`}
-            >
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    {item.image ? (
-                      <img
-                        src={item.image}
-                        alt={item.name}
-                        className="h-10 w-10 rounded-full object-cover border border-border"
-                      />
-                    ) : (
-                      <div className="h-10 w-10 rounded-full bg-blue-100 dark:bg-blue-950 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold text-sm">
-                        {item.name.charAt(0)}
+      <div className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {paginatedTestimonials.length === 0 ? (
+            <div className="col-span-full py-12 text-center text-muted-foreground bg-card rounded-2xl border border-border">
+              <Quote className="h-8 w-8 mx-auto mb-2 opacity-40" />
+              No testimonials found.
+            </div>
+          ) : (
+            paginatedTestimonials.map((item) => (
+              <div
+                key={item.id}
+                className={`bg-card rounded-2xl border ${
+                  item.status ? "border-border" : "border-amber-500/30 bg-amber-500/5"
+                } p-6 shadow-sm flex flex-col justify-between space-y-4`}
+              >
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      {item.image ? (
+                        <img
+                          src={item.image}
+                          alt={item.name}
+                          className="h-10 w-10 rounded-full object-cover border border-border"
+                        />
+                      ) : (
+                        <div className="h-10 w-10 rounded-full bg-blue-100 dark:bg-blue-950 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold text-sm">
+                          {item.name.charAt(0)}
+                        </div>
+                      )}
+                      <div>
+                        <h3 className="font-bold text-sm text-foreground">{item.name}</h3>
+                        <p className="text-xs text-muted-foreground">{item.role}</p>
                       </div>
-                    )}
-                    <div>
-                      <h3 className="font-bold text-sm text-foreground">{item.name}</h3>
-                      <p className="text-xs text-muted-foreground">{item.role}</p>
                     </div>
+
+                    <button
+                      onClick={() => handleToggleStatus(item)}
+                      title={item.status ? "Active (click to disable)" : "Disabled (click to activate)"}
+                      className="cursor-pointer"
+                    >
+                      {item.status ? (
+                        <ToggleRight className="h-6 w-6 text-green-500" />
+                      ) : (
+                        <ToggleLeft className="h-6 w-6 text-muted-foreground" />
+                      )}
+                    </button>
                   </div>
 
-                  <button
-                    onClick={() => handleToggleStatus(item)}
-                    title={item.status ? "Active (click to disable)" : "Disabled (click to activate)"}
-                    className="cursor-pointer"
-                  >
-                    {item.status ? (
-                      <ToggleRight className="h-6 w-6 text-green-500" />
-                    ) : (
-                      <ToggleLeft className="h-6 w-6 text-muted-foreground" />
-                    )}
-                  </button>
+                  <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed italic border-l-2 border-blue-500 pl-3">
+                    "{item.quote}"
+                  </p>
                 </div>
 
-                <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed italic border-l-2 border-blue-500 pl-3">
-                  "{item.quote}"
-                </p>
-              </div>
+                <div className="flex items-center justify-between pt-3 border-t border-border text-xs text-muted-foreground">
+                  <span className={item.status ? "text-green-500 font-semibold" : "text-amber-500 font-semibold"}>
+                    {item.status ? "Published" : "Hidden"}
+                  </span>
 
-              <div className="flex items-center justify-between pt-3 border-t border-border text-xs text-muted-foreground">
-                <span className={item.status ? "text-green-500 font-semibold" : "text-amber-500 font-semibold"}>
-                  {item.status ? "Published" : "Hidden"}
-                </span>
-
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => openEditModal(item)}
-                    className="p-1.5 rounded-lg border border-border text-foreground hover:bg-muted transition-colors cursor-pointer"
-                  >
-                    <Edit className="h-3.5 w-3.5" />
-                  </button>
-                  <button
-                    onClick={() => setDeletingId(item.id)}
-                    className="p-1.5 rounded-lg border border-red-500/20 text-red-500 hover:bg-red-500/10 transition-colors cursor-pointer"
-                  >
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => openEditModal(item)}
+                      className="p-1.5 rounded-lg border border-border text-foreground hover:bg-muted transition-colors cursor-pointer"
+                    >
+                      <Edit className="h-3.5 w-3.5" />
+                    </button>
+                    <button
+                      onClick={() => setDeletingId(item.id)}
+                      className="p-1.5 rounded-lg border border-red-500/20 text-red-500 hover:bg-red-500/10 transition-colors cursor-pointer"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))
-        )}
+            ))
+          )}
+        </div>
+        <Pagination meta={paginationMeta} onPageChange={setCurrentPage} />
       </div>
 
       {/* Add / Edit Modal */}

@@ -9,6 +9,7 @@ import Image from "next/image";
 import CustomSelect from "@/components/CustomSelect";
 import ImagePicker from "@/components/ImagePicker";
 import ConfirmDeleteModal from "@/components/ConfirmDeleteModal";
+import Pagination from "@/components/Pagination";
 
 export default function CampaignManager({ initialCampaigns = [] }) {
   const router = useRouter();
@@ -19,11 +20,29 @@ export default function CampaignManager({ initialCampaigns = [] }) {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 8;
 
   // Sync props to state
   useEffect(() => {
     setCampaigns(initialCampaigns);
   }, [initialCampaigns]);
+
+  const totalItems = campaigns.length;
+  const totalPages = Math.ceil(totalItems / pageSize) || 1;
+  const paginatedCampaigns = campaigns.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
+
+  const paginationMeta = {
+    currentPage,
+    totalPages,
+    totalItems,
+    pageSize,
+    hasNextPage: currentPage < totalPages,
+    hasPrevPage: currentPage > 1,
+  };
 
   // Delete modal states
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -134,82 +153,85 @@ export default function CampaignManager({ initialCampaigns = [] }) {
       </div>
 
       {/* Campaigns Grid */}
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {campaigns.map((c) => {
-          const raised = c.raisedAmount || 0;
-          const percent = Math.min(Math.round((raised / c.targetAmount) * 100), 100);
+      <div className="space-y-6">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {paginatedCampaigns.map((c) => {
+            const raised = c.raisedAmount || 0;
+            const percent = Math.min(Math.round((raised / c.targetAmount) * 100), 100);
 
-          return (
-            <div
-              key={c.id}
-              className="flex flex-col rounded-3xl border border-zinc-200 bg-white overflow-hidden shadow-sm dark:border-zinc-800 dark:bg-zinc-900"
-            >
-              {/* Cover Image */}
-              <div className="relative aspect-16/10">
-                <Image src={c.image} alt={c.title} fill className="object-cover" />
-                <div className="absolute top-4 left-4 rounded-full bg-zinc-950/70 backdrop-blur px-2.5 py-0.5 text-xxs font-bold text-white">
-                  {c.status}
+            return (
+              <div
+                key={c.id}
+                className="flex flex-col rounded-3xl border border-zinc-200 bg-white overflow-hidden shadow-sm dark:border-zinc-800 dark:bg-zinc-900"
+              >
+                {/* Cover Image */}
+                <div className="relative aspect-16/10">
+                  <Image src={c.image} alt={c.title} fill className="object-cover" />
+                  <div className="absolute top-4 left-4 rounded-full bg-zinc-950/70 backdrop-blur px-2.5 py-0.5 text-xxs font-bold text-white">
+                    {c.status}
+                  </div>
+                </div>
+
+                {/* Info content */}
+                <div className="flex-1 p-6 flex flex-col justify-between">
+                  <div>
+                    <h3 className="text-lg font-bold text-zinc-900 dark:text-white line-clamp-1">
+                      {c.title}
+                    </h3>
+                    <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-400 line-clamp-3">
+                      {c.description}
+                    </p>
+                  </div>
+
+                  <div className="mt-6 pt-4 border-t border-zinc-100 dark:border-zinc-800">
+                    {/* Progress info */}
+                    <div className="w-full bg-zinc-100 rounded-full h-1.5 dark:bg-zinc-800">
+                      <div
+                        className="bg-blue-600 h-1.5 rounded-full transition-all"
+                        style={{ width: `${percent}%` }}
+                      />
+                    </div>
+                    <div className="mt-3 flex justify-between text-xxs font-semibold">
+                      <div>
+                        <span className="text-zinc-400">Raised:</span>{" "}
+                        <strong className="text-zinc-900 dark:text-white">₦{raised.toLocaleString()}</strong>
+                      </div>
+                      <div>
+                        <span className="text-zinc-400">Target:</span>{" "}
+                        <strong className="text-zinc-900 dark:text-white">₦{c.targetAmount.toLocaleString()}</strong>
+                      </div>
+                    </div>
+
+                    {/* Actions */}
+                    <div className="mt-6 flex justify-end gap-2">
+                      <button
+                        onClick={() => openEditModal(c)}
+                        className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-200 hover:bg-zinc-50 text-zinc-600 dark:border-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-950 transition-colors cursor-pointer"
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </button>
+                      <button
+                        onClick={() => {
+                          setCampaignToDelete(c.id);
+                          setDeleteModalOpen(true);
+                        }}
+                        className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-red-100 text-red-600 hover:bg-red-50 dark:border-red-950/40 dark:text-red-400 dark:hover:bg-red-950/20 transition-colors cursor-pointer"
+                      >
+                        <Trash className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
-
-              {/* Info content */}
-              <div className="flex-1 p-6 flex flex-col justify-between">
-                <div>
-                  <h3 className="text-lg font-bold text-zinc-900 dark:text-white line-clamp-1">
-                    {c.title}
-                  </h3>
-                  <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-400 line-clamp-3">
-                    {c.description}
-                  </p>
-                </div>
-
-                <div className="mt-6 pt-4 border-t border-zinc-100 dark:border-zinc-800">
-                  {/* Progress info */}
-                  <div className="w-full bg-zinc-100 rounded-full h-1.5 dark:bg-zinc-800">
-                    <div
-                      className="bg-blue-600 h-1.5 rounded-full transition-all"
-                      style={{ width: `${percent}%` }}
-                    />
-                  </div>
-                  <div className="mt-3 flex justify-between text-xxs font-semibold">
-                    <div>
-                      <span className="text-zinc-400">Raised:</span>{" "}
-                      <strong className="text-zinc-900 dark:text-white">₦{raised.toLocaleString()}</strong>
-                    </div>
-                    <div>
-                      <span className="text-zinc-400">Target:</span>{" "}
-                      <strong className="text-zinc-900 dark:text-white">₦{c.targetAmount.toLocaleString()}</strong>
-                    </div>
-                  </div>
-
-                  {/* Actions */}
-                  <div className="mt-6 flex justify-end gap-2">
-                    <button
-                      onClick={() => openEditModal(c)}
-                      className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-200 hover:bg-zinc-50 text-zinc-600 dark:border-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-950 transition-colors cursor-pointer"
-                    >
-                      <Pencil className="h-4 w-4" />
-                    </button>
-                    <button
-                      onClick={() => {
-                        setCampaignToDelete(c.id);
-                        setDeleteModalOpen(true);
-                      }}
-                      className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-red-100 text-red-600 hover:bg-red-50 dark:border-red-950/40 dark:text-red-400 dark:hover:bg-red-950/20 transition-colors cursor-pointer"
-                    >
-                      <Trash className="h-4 w-4" />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          );
-        })}
-        {campaigns.length === 0 && (
-          <p className="col-span-full py-16 text-center text-sm text-zinc-400">
-            No campaigns configured. Click "Create Campaign" to get started.
-          </p>
-        )}
+            );
+          })}
+          {campaigns.length === 0 && (
+            <p className="col-span-full py-16 text-center text-sm text-zinc-400">
+              No campaigns configured. Click "Create Campaign" to get started.
+            </p>
+          )}
+        </div>
+        <Pagination meta={paginationMeta} onPageChange={setCurrentPage} />
       </div>
 
       {/* Editor Modal */}

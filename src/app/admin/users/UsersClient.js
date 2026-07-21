@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Plus, Trash2, UserCog, Shield, User, Search } from "lucide-react";
 import ConfirmDeleteModal from "@/components/ConfirmDeleteModal";
+import Pagination from "@/components/Pagination";
 import { createUserAction, updateUserRoleAction, deleteUserAction } from "@/app/actions/user";
 import { toast } from "sonner";
 
@@ -15,10 +16,29 @@ export default function UsersClient({ initialUsers }) {
   const [deletingId, setDeletingId] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 10;
+
   const filteredUsers = users.filter((u) => {
     const term = searchTerm.toLowerCase();
     return u.name.toLowerCase().includes(term) || u.email.toLowerCase().includes(term);
   });
+
+  const totalItems = filteredUsers.length;
+  const totalPages = Math.ceil(totalItems / pageSize) || 1;
+  const paginatedUsers = filteredUsers.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
+
+  const paginationMeta = {
+    currentPage,
+    totalPages,
+    totalItems,
+    pageSize,
+    hasNextPage: currentPage < totalPages,
+    hasPrevPage: currentPage > 1,
+  };
 
   const handleCreateUser = async (e) => {
     e.preventDefault();
@@ -75,7 +95,10 @@ export default function UsersClient({ initialUsers }) {
             type="text"
             placeholder="Search by name or email..."
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e) => {
+              setSearchTerm(e.target.value);
+              setCurrentPage(1);
+            }}
             className="block w-full rounded-md border border-zinc-200 bg-white h-11 pl-10 pr-4 text-sm text-zinc-900 focus:border-blue-500 focus:outline-none dark:border-zinc-800 dark:bg-zinc-900 dark:text-white transition-colors"
           />
         </div>
@@ -102,7 +125,7 @@ export default function UsersClient({ initialUsers }) {
               </tr>
             </thead>
             <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
-              {filteredUsers.length === 0 ? (
+              {paginatedUsers.length === 0 ? (
                 <tr>
                   <td colSpan={5} className="px-6 py-12 text-center text-zinc-400">
                     <UserCog className="h-8 w-8 mx-auto mb-2 opacity-40" />
@@ -110,7 +133,7 @@ export default function UsersClient({ initialUsers }) {
                   </td>
                 </tr>
               ) : (
-                filteredUsers.map((user) => (
+                paginatedUsers.map((user) => (
                   <tr key={user.id} className="hover:bg-zinc-50/50 dark:hover:bg-zinc-950/20 transition-colors">
                     <td className="px-6 py-4 font-bold text-foreground">
                       <div className="flex items-center gap-2.5">
@@ -159,6 +182,7 @@ export default function UsersClient({ initialUsers }) {
             </tbody>
           </table>
         </div>
+        <Pagination meta={paginationMeta} onPageChange={setCurrentPage} />
       </div>
 
       {/* Create User Modal */}

@@ -9,6 +9,7 @@ import Image from "next/image";
 import CustomSelect from "@/components/CustomSelect";
 import ImagePicker from "@/components/ImagePicker";
 import ConfirmDeleteModal from "@/components/ConfirmDeleteModal";
+import Pagination from "@/components/Pagination";
 
 import UsersIcon from "lucide-react/dist/esm/icons/users";
 import Eye from "lucide-react/dist/esm/icons/eye";
@@ -25,6 +26,8 @@ export default function EventsManager({ initialEvents = [], initialRsvps = [] })
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 8;
 
   // Sync props to state
   useEffect(() => {
@@ -47,6 +50,31 @@ export default function EventsManager({ initialEvents = [], initialRsvps = [] })
 
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL");
+
+  const filteredEvents = events.filter((e) => {
+    const matchesSearch =
+      e.title.toLowerCase().includes(search.toLowerCase()) ||
+      e.venue.toLowerCase().includes(search.toLowerCase()) ||
+      e.description.toLowerCase().includes(search.toLowerCase());
+    const matchesStatus = statusFilter === "ALL" || e.status === statusFilter;
+    return matchesSearch && matchesStatus;
+  });
+
+  const totalItems = filteredEvents.length;
+  const totalPages = Math.ceil(totalItems / pageSize) || 1;
+  const paginatedEvents = filteredEvents.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
+
+  const paginationMeta = {
+    currentPage,
+    totalPages,
+    totalItems,
+    pageSize,
+    hasNextPage: currentPage < totalPages,
+    hasPrevPage: currentPage > 1,
+  };
 
   const openCreateModal = () => {
     setEditEvent(null);
@@ -136,17 +164,7 @@ export default function EventsManager({ initialEvents = [], initialRsvps = [] })
     }
   };
 
-  // Filter events
-  const filteredEvents = events.filter((e) => {
-    const matchesSearch =
-      e.title.toLowerCase().includes(search.toLowerCase()) ||
-      e.venue.toLowerCase().includes(search.toLowerCase()) ||
-      e.description.toLowerCase().includes(search.toLowerCase());
 
-    const matchesStatus = statusFilter === "ALL" || e.status === statusFilter;
-
-    return matchesSearch && matchesStatus;
-  });
 
   return (
     <div className="space-y-8">
@@ -194,105 +212,108 @@ export default function EventsManager({ initialEvents = [], initialRsvps = [] })
       </div>
 
       {/* Events Grid */}
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {filteredEvents.map((e) => {
-          const formattedDate = new Date(e.date).toLocaleDateString("en-US", {
-            weekday: "short",
-            month: "short",
-            day: "numeric",
-            year: "numeric",
-            hour: "2-digit",
-            minute: "2-digit",
-          });
+      <div className="space-y-6">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {paginatedEvents.map((e) => {
+            const formattedDate = new Date(e.date).toLocaleDateString("en-US", {
+              weekday: "short",
+              month: "short",
+              day: "numeric",
+              year: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+            });
 
-          return (
-            <div
-              key={e.id}
-              className="flex flex-col rounded-3xl border border-zinc-200 bg-white overflow-hidden shadow-sm dark:border-zinc-800 dark:bg-zinc-900"
-            >
-              {/* Event Image */}
-              <div className="relative aspect-16/10 bg-zinc-100 dark:bg-zinc-950">
-                {e.image ? (
-                  <Image src={e.image} alt={e.title} fill className="object-cover" />
-                ) : (
-                  <div className="flex h-full w-full items-center justify-center bg-blue-50/50 text-blue-600 dark:bg-blue-950/20 dark:text-blue-400">
-                    <Calendar className="h-12 w-12 stroke-[1.5]" />
+            return (
+              <div
+                key={e.id}
+                className="flex flex-col rounded-3xl border border-zinc-200 bg-white overflow-hidden shadow-sm dark:border-zinc-800 dark:bg-zinc-900"
+              >
+                {/* Event Image */}
+                <div className="relative aspect-16/10 bg-zinc-100 dark:bg-zinc-950">
+                  {e.image ? (
+                    <Image src={e.image} alt={e.title} fill className="object-cover" />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center bg-blue-50/50 text-blue-600 dark:bg-blue-950/20 dark:text-blue-400">
+                      <Calendar className="h-12 w-12 stroke-[1.5]" />
+                    </div>
+                  )}
+                  <div className="absolute top-4 left-4 rounded-full bg-zinc-950/70 backdrop-blur px-2.5 py-0.5 text-xxs font-bold text-white">
+                    {e.status}
                   </div>
-                )}
-                <div className="absolute top-4 left-4 rounded-full bg-zinc-950/70 backdrop-blur px-2.5 py-0.5 text-xxs font-bold text-white">
-                  {e.status}
+                </div>
+
+                {/* Event Info */}
+                <div className="flex-1 p-6 flex flex-col justify-between">
+                  <div>
+                    <h3 className="text-lg font-bold text-zinc-900 dark:text-white line-clamp-1">
+                      {e.title}
+                    </h3>
+                    <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-400 line-clamp-3">
+                      {e.description}
+                    </p>
+                  </div>
+
+                  <div className="mt-6 pt-4 border-t border-zinc-100 dark:border-zinc-800 space-y-3">
+                    {/* Date, Venue, Registration details */}
+                    <div className="flex flex-col gap-2 text-xxs font-semibold text-zinc-500 dark:text-zinc-400">
+                      <div className="flex items-center gap-1.5">
+                        <Calendar className="h-3.5 w-3.5 text-blue-600" />
+                        <span>{formattedDate}</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <MapPin className="h-3.5 w-3.5 text-zinc-400" />
+                        <span className="truncate">{e.venue}</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <CheckSquare className="h-3.5 w-3.5 text-zinc-400" />
+                        <span>
+                          {e.registrationRequired ? "Registration Required" : "Open Event"}
+                          {e.attendeesCount > 0 && ` (${e.attendeesCount} joined)`}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Actions */}
+                    <div className="flex items-center justify-between pt-2">
+                      <button
+                        onClick={() => setSelectedGuestEvent(e)}
+                        className="px-2.5 py-1.5 rounded-lg border border-blue-500/20 bg-blue-50/50 text-blue-600 dark:bg-blue-950/20 dark:text-blue-400 dark:border-blue-900/50 text-xs font-semibold hover:bg-blue-100 transition-colors inline-flex items-center gap-1.5 cursor-pointer"
+                      >
+                        <UsersIcon className="h-3.5 w-3.5" /> Guests ({e.attendeesCount})
+                      </button>
+
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => openEditModal(e)}
+                          className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-200 hover:bg-zinc-50 text-zinc-600 dark:border-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-950 transition-colors cursor-pointer"
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </button>
+                        <button
+                          onClick={() => {
+                            setEventToDelete(e.id);
+                            setDeleteModalOpen(true);
+                          }}
+                          className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-red-100 text-red-600 hover:bg-red-50 dark:border-red-950/40 dark:text-red-400 dark:hover:bg-red-950/20 transition-colors cursor-pointer"
+                        >
+                          <Trash className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
+            );
+          })}
 
-              {/* Event Info */}
-              <div className="flex-1 p-6 flex flex-col justify-between">
-                <div>
-                  <h3 className="text-lg font-bold text-zinc-900 dark:text-white line-clamp-1">
-                    {e.title}
-                  </h3>
-                  <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-400 line-clamp-3">
-                    {e.description}
-                  </p>
-                </div>
-
-                <div className="mt-6 pt-4 border-t border-zinc-100 dark:border-zinc-800 space-y-3">
-                  {/* Date, Venue, Registration details */}
-                  <div className="flex flex-col gap-2 text-xxs font-semibold text-zinc-500 dark:text-zinc-400">
-                    <div className="flex items-center gap-1.5">
-                      <Calendar className="h-3.5 w-3.5 text-blue-600" />
-                      <span>{formattedDate}</span>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      <MapPin className="h-3.5 w-3.5 text-zinc-400" />
-                      <span className="truncate">{e.venue}</span>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      <CheckSquare className="h-3.5 w-3.5 text-zinc-400" />
-                      <span>
-                        {e.registrationRequired ? "Registration Required" : "Open Event"}
-                        {e.attendeesCount > 0 && ` (${e.attendeesCount} joined)`}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Actions */}
-                  <div className="flex items-center justify-between pt-2">
-                    <button
-                      onClick={() => setSelectedGuestEvent(e)}
-                      className="px-2.5 py-1.5 rounded-lg border border-blue-500/20 bg-blue-50/50 text-blue-600 dark:bg-blue-950/20 dark:text-blue-400 dark:border-blue-900/50 text-xs font-semibold hover:bg-blue-100 transition-colors inline-flex items-center gap-1.5 cursor-pointer"
-                    >
-                      <UsersIcon className="h-3.5 w-3.5" /> Guests ({e.attendeesCount})
-                    </button>
-
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => openEditModal(e)}
-                        className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-200 hover:bg-zinc-50 text-zinc-600 dark:border-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-950 transition-colors cursor-pointer"
-                      >
-                        <Pencil className="h-4 w-4" />
-                      </button>
-                      <button
-                        onClick={() => {
-                          setEventToDelete(e.id);
-                          setDeleteModalOpen(true);
-                        }}
-                        className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-red-100 text-red-600 hover:bg-red-50 dark:border-red-950/40 dark:text-red-400 dark:hover:bg-red-950/20 transition-colors cursor-pointer"
-                      >
-                        <Trash className="h-4 w-4" />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          );
-        })}
-
-        {filteredEvents.length === 0 && (
-          <p className="col-span-full py-16 text-center text-sm text-zinc-400">
-            No events found. Click "Schedule Event" to plan an activity.
-          </p>
-        )}
+          {filteredEvents.length === 0 && (
+            <p className="col-span-full py-16 text-center text-sm text-zinc-400">
+              No events found. Click "Schedule Event" to plan an activity.
+            </p>
+          )}
+        </div>
+        <Pagination meta={paginationMeta} onPageChange={setCurrentPage} />
       </div>
 
       {/* Editor Modal */}

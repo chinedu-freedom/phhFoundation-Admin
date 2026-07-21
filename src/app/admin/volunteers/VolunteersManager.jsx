@@ -3,12 +3,15 @@
 import { useState } from "react";
 import { Search, X, FileText } from "lucide-react";
 import CustomSelect from "@/components/CustomSelect";
+import Pagination from "@/components/Pagination";
 
 export default function VolunteersManager({ initialVolunteers = [] }) {
   const [volunteers, setVolunteers] = useState(initialVolunteers);
   const [search, setSearch] = useState("");
   const [selectedSkill, setSelectedSkill] = useState("ALL");
   const [selectedMotivation, setSelectedMotivation] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 10;
 
   // Extract unique skills for dropdown options
   const allSkillsSet = new Set();
@@ -42,6 +45,22 @@ export default function VolunteersManager({ initialVolunteers = [] }) {
     return matchesSearch && matchesSkill;
   });
 
+  const totalItems = filteredVolunteers.length;
+  const totalPages = Math.ceil(totalItems / pageSize) || 1;
+  const paginatedVolunteers = filteredVolunteers.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
+
+  const paginationMeta = {
+    currentPage,
+    totalPages,
+    totalItems,
+    pageSize,
+    hasNextPage: currentPage < totalPages,
+    hasPrevPage: currentPage > 1,
+  };
+
   return (
     <div className="space-y-6">
       {/* Search & Skill Filter */}
@@ -52,7 +71,10 @@ export default function VolunteersManager({ initialVolunteers = [] }) {
             type="text"
             placeholder="Search by name, skills, location..."
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setCurrentPage(1);
+            }}
             className="block w-full rounded-md border border-zinc-200 bg-white h-11 pl-10 pr-4 text-sm text-zinc-900 focus:border-blue-500 focus:outline-none dark:border-zinc-800 dark:bg-zinc-900 dark:text-white transition-colors"
           />
         </div>
@@ -60,62 +82,66 @@ export default function VolunteersManager({ initialVolunteers = [] }) {
         {/* Skill / Talent Filter */}
         <CustomSelect
           value={selectedSkill}
-          onChange={setSelectedSkill}
+          onChange={(val) => {
+            setSelectedSkill(val);
+            setCurrentPage(1);
+          }}
           options={skillOptions}
           placeholder="Filter Skill..."
           className="w-full md:w-56"
         />
       </div>
 
-      {/* Applications Grid/Table */}
+      {/* Applications Table */}
       <div className="rounded-md border border-zinc-200 bg-white overflow-hidden shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm text-zinc-500 dark:text-zinc-400">
             <thead className="bg-zinc-50 text-xs font-bold uppercase tracking-wider text-zinc-400 dark:bg-zinc-950">
               <tr>
                 <th className="px-6 py-4">Applicant</th>
-                <th className="px-6 py-4">Email & Date</th>
+                <th className="px-6 py-4">Contact</th>
                 <th className="px-6 py-4">Location</th>
-                <th className="px-6 py-4">Skills & Talents</th>
-                <th className="px-6 py-4">Availability</th>
-                <th className="px-6 py-4">Letter</th>
+                <th className="px-6 py-4">Skills / Talents</th>
+                <th className="px-6 py-4">Applied Date</th>
+                <th className="px-6 py-4 text-right">Motivation</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
-              {filteredVolunteers.map((v) => (
+              {paginatedVolunteers.map((v) => (
                 <tr key={v.id} className="hover:bg-zinc-50/50 dark:hover:bg-zinc-950/20">
-                  <td className="px-6 py-4">
-                    <div className="font-bold text-zinc-900 dark:text-white">
-                      {v.name}
-                    </div>
-                    <div className="text-xxs text-zinc-400">
-                      {v.phone}
-                    </div>
+                  <td className="px-6 py-4 font-bold text-zinc-900 dark:text-white">
+                    {v.name}
                   </td>
                   <td className="px-6 py-4">
-                    <div className="font-semibold text-xs text-zinc-900 dark:text-white">
-                      {v.email}
-                    </div>
-                    <div className="text-xxs text-zinc-400 mt-0.5">
-                      Applied: {v.createdAt ? new Date(v.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "N/A"}
-                    </div>
+                    <div className="text-zinc-900 dark:text-white font-medium">{v.email}</div>
+                    <div className="text-xs text-zinc-400">{v.phone}</div>
                   </td>
-                  <td className="px-6 py-4 text-xs font-semibold">{v.location}</td>
-                  <td className="px-6 py-4 text-xs max-w-[200px] truncate" title={v.skills}>
-                    {v.skills}
+                  <td className="px-6 py-4 font-medium text-zinc-700 dark:text-zinc-300">
+                    {v.location}
                   </td>
-                  <td className="px-6 py-4 text-xs">{v.availability}</td>
                   <td className="px-6 py-4">
-                    {v.motivation ? (
-                      <button
-                        onClick={() => setSelectedMotivation(v)}
-                        className="inline-flex cursor-pointer items-center gap-1 text-xs font-bold text-blue-600 hover:text-blue-700 dark:text-blue-400"
-                      >
-                        <FileText className="h-4 w-4" /> View
-                      </button>
-                    ) : (
-                      <span className="text-zinc-400 text-xxs font-medium">None</span>
-                    )}
+                    <div className="flex flex-wrap gap-1">
+                      {v.skills.split(",").map((s, idx) => (
+                        <span
+                          key={idx}
+                          className="inline-flex items-center rounded-full bg-blue-50 px-2 py-0.5 text-xxs font-semibold text-blue-700 dark:bg-blue-950/40 dark:text-blue-400"
+                        >
+                          {s.trim()}
+                        </span>
+                      ))}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 text-xs text-zinc-400">
+                    {new Date(v.createdAt).toLocaleDateString()}
+                  </td>
+                  <td className="px-6 py-4 text-right">
+                    <button
+                      onClick={() => setSelectedMotivation(v)}
+                      className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-xs font-semibold text-zinc-700 hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-850 transition-colors shadow-xs"
+                    >
+                      <FileText className="h-3.5 w-3.5 text-blue-500" />
+                      Read Letter
+                    </button>
                   </td>
                 </tr>
               ))}
@@ -129,6 +155,7 @@ export default function VolunteersManager({ initialVolunteers = [] }) {
             </tbody>
           </table>
         </div>
+        <Pagination meta={paginationMeta} onPageChange={setCurrentPage} />
       </div>
 
       {/* Motivation Letter Modal */}

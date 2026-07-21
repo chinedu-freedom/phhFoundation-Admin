@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { Search, Trash2, Mail, Eye, Calendar, User, Building } from "lucide-react";
+import { Search, Trash2, Mail, Eye, Calendar, User } from "lucide-react";
 import ConfirmDeleteModal from "@/components/ConfirmDeleteModal";
+import Pagination from "@/components/Pagination";
 import { deleteAuditLogAction } from "@/app/actions/contact";
 import { toast } from "sonner";
 
@@ -12,6 +13,8 @@ export default function MessagesClient({ initialMessages }) {
   const [selectedMessage, setSelectedMessage] = useState(null);
   const [deletingId, setDeletingId] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 10;
 
   const filteredMessages = messages.filter((m) => {
     const term = searchTerm.toLowerCase();
@@ -19,6 +22,22 @@ export default function MessagesClient({ initialMessages }) {
     const details = m.details?.toLowerCase() || "";
     return email.includes(term) || details.includes(term);
   });
+
+  const totalItems = filteredMessages.length;
+  const totalPages = Math.ceil(totalItems / pageSize) || 1;
+  const paginatedMessages = filteredMessages.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
+
+  const paginationMeta = {
+    currentPage,
+    totalPages,
+    totalItems,
+    pageSize,
+    hasNextPage: currentPage < totalPages,
+    hasPrevPage: currentPage > 1,
+  };
 
   const handleDelete = async () => {
     if (!deletingId) return;
@@ -40,18 +59,21 @@ export default function MessagesClient({ initialMessages }) {
     <div className="space-y-6">
       {/* Search Header */}
       <div className="flex flex-col md:flex-row gap-4 md:items-center justify-between">
-        <div className="relative flex-1">
+        <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400 pointer-events-none" />
           <input
             type="text"
-            placeholder="Search by email, name or keyword..."
+            placeholder="Search messages by email or content..."
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e) => {
+              setSearchTerm(e.target.value);
+              setCurrentPage(1);
+            }}
             className="block w-full rounded-md border border-zinc-200 bg-white h-11 pl-10 pr-4 text-sm text-zinc-900 focus:border-blue-500 focus:outline-none dark:border-zinc-800 dark:bg-zinc-900 dark:text-white transition-colors"
           />
         </div>
         <div className="text-xs font-semibold text-zinc-500 dark:text-zinc-400">
-          Total Inquiries: <span className="font-bold text-zinc-900 dark:text-white">{messages.length}</span>
+          Total Messages: <span className="font-bold text-zinc-900 dark:text-white">{messages.length}</span>
         </div>
       </div>
 
@@ -61,14 +83,14 @@ export default function MessagesClient({ initialMessages }) {
           <table className="w-full text-left text-sm text-zinc-500 dark:text-zinc-400">
             <thead className="bg-zinc-50 text-xs font-bold uppercase tracking-wider text-zinc-400 dark:bg-zinc-950">
               <tr>
-                <th className="px-6 py-4">Date</th>
+                <th className="px-6 py-4">Received Date</th>
                 <th className="px-6 py-4">Sender Email</th>
-                <th className="px-6 py-4">Details Summary</th>
+                <th className="px-6 py-4">Message Snippet</th>
                 <th className="px-6 py-4 text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
-              {filteredMessages.length === 0 ? (
+              {paginatedMessages.length === 0 ? (
                 <tr>
                   <td colSpan={4} className="px-6 py-12 text-center text-zinc-400">
                     <Mail className="h-8 w-8 mx-auto mb-2 opacity-40" />
@@ -76,21 +98,13 @@ export default function MessagesClient({ initialMessages }) {
                   </td>
                 </tr>
               ) : (
-                filteredMessages.map((msg) => (
+                paginatedMessages.map((msg) => (
                   <tr key={msg.id} className="hover:bg-zinc-50/50 dark:hover:bg-zinc-950/20 transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap text-xs text-muted-foreground">
-                      {new Date(msg.createdAt).toLocaleDateString("en-US", {
-                        month: "short",
-                        day: "numeric",
-                        year: "numeric",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
+                      {new Date(msg.createdAt).toLocaleString()}
                     </td>
-                    <td className="px-6 py-4 font-medium text-foreground">
-                      <a href={`mailto:${msg.userEmail}`} className="text-blue-600 dark:text-blue-400 hover:underline">
-                        {msg.userEmail || "Anonymous"}
-                      </a>
+                    <td className="px-6 py-4 font-medium text-xs text-foreground">
+                      {msg.userEmail}
                     </td>
                     <td className="px-6 py-4 text-xs text-muted-foreground max-w-md truncate">
                       {msg.details}
@@ -118,6 +132,7 @@ export default function MessagesClient({ initialMessages }) {
             </tbody>
           </table>
         </div>
+        <Pagination meta={paginationMeta} onPageChange={setCurrentPage} />
       </div>
 
       {/* Message Modal Drawer */}

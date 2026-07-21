@@ -9,6 +9,7 @@ import Image from "next/image";
 import CustomSelect from "@/components/CustomSelect";
 import ImagePicker from "@/components/ImagePicker";
 import ConfirmDeleteModal from "@/components/ConfirmDeleteModal";
+import Pagination from "@/components/Pagination";
 
 export default function BlogManager({ initialPosts = [] }) {
   const router = useRouter();
@@ -16,6 +17,10 @@ export default function BlogManager({ initialPosts = [] }) {
   const [posts, setPosts] = useState(initialPosts);
   const [showModal, setShowModal] = useState(false);
   const [editPost, setEditPost] = useState(null); // Null for create, BlogPost object for edit
+  const [searchQuery, setSearchQuery] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("ALL");
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 8;
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -25,7 +30,30 @@ export default function BlogManager({ initialPosts = [] }) {
     setPosts(initialPosts);
   }, [initialPosts]);
 
-  // Delete modal states
+  const filteredPosts = posts.filter((post) => {
+    const matchesSearch =
+      post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      post.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      post.authorName.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCategory = categoryFilter === "ALL" || post.category === categoryFilter;
+    return matchesSearch && matchesCategory;
+  });
+
+  const totalItems = filteredPosts.length;
+  const totalPages = Math.ceil(totalItems / pageSize) || 1;
+  const paginatedPosts = filteredPosts.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
+
+  const paginationMeta = {
+    currentPage,
+    totalPages,
+    totalItems,
+    pageSize,
+    hasNextPage: currentPage < totalPages,
+    hasPrevPage: currentPage > 1,
+  };// Delete modal states
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [postToDelete, setPostToDelete] = useState(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
@@ -124,18 +152,7 @@ export default function BlogManager({ initialPosts = [] }) {
     }
   };
 
-  // Filter posts
-  const filteredPosts = posts.filter((p) => {
-    const matchesSearch =
-      p.title.toLowerCase().includes(search.toLowerCase()) ||
-      p.category.toLowerCase().includes(search.toLowerCase()) ||
-      p.content.toLowerCase().includes(search.toLowerCase()) ||
-      p.authorName.toLowerCase().includes(search.toLowerCase());
 
-    const matchesStatus = statusFilter === "ALL" || p.status === statusFilter;
-
-    return matchesSearch && matchesStatus;
-  });
 
   return (
     <div className="space-y-8">
@@ -182,76 +199,79 @@ export default function BlogManager({ initialPosts = [] }) {
       </div>
 
       {/* Articles Grid */}
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {filteredPosts.map((post) => (
-          <div
-            key={post.id}
-            className="flex flex-col rounded-md border border-zinc-200 bg-white overflow-hidden shadow-sm dark:border-zinc-800 dark:bg-zinc-900"
-          >
-            <div className="relative aspect-video bg-zinc-100 dark:bg-zinc-950">
-              <Image
-                src={post.image || "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=600"}
-                alt={post.title}
-                fill
-                className="object-cover"
-              />
-              <div className="absolute top-4 left-4 rounded-full bg-zinc-950/70 backdrop-blur px-2.5 py-0.5 text-xxs font-bold text-white">
-                {post.status}
-              </div>
-            </div>
-
-            <div className="flex-1 p-6 flex flex-col justify-between">
-              <div>
-                <span className="text-xxs font-bold uppercase tracking-widest text-blue-600 dark:text-blue-400">
-                  {post.category}
-                </span>
-                <h3 className="mt-2 text-base font-bold text-zinc-900 dark:text-white line-clamp-2">
-                  {post.title}
-                </h3>
-                <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-400 line-clamp-3">
-                  {post.content}
-                </p>
-              </div>
-
-              <div className="mt-6 pt-4 border-t border-zinc-100 dark:border-zinc-800 space-y-3">
-                <div className="flex items-center justify-between text-xxs text-zinc-400 font-semibold">
-                  <div className="flex items-center gap-1.5">
-                    <User className="h-3.5 w-3.5" /> {post.authorName}
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <Clock className="h-3.5 w-3.5" />
-                    {new Date(post.createdAt).toLocaleDateString()}
-                  </div>
-                </div>
-
-                {/* Actions */}
-                <div className="flex justify-end gap-2 pt-2">
-                  <button
-                    onClick={() => openEditModal(post)}
-                    className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-200 hover:bg-zinc-50 text-zinc-600 dark:border-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-950 transition-colors cursor-pointer"
-                  >
-                    <Pencil className="h-4 w-4" />
-                  </button>
-                  <button
-                    onClick={() => {
-                      setPostToDelete(post.id);
-                      setDeleteModalOpen(true);
-                    }}
-                    className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-red-100 text-red-600 hover:bg-red-50 dark:border-red-950/40 dark:text-red-400 dark:hover:bg-red-950/20 transition-colors cursor-pointer"
-                  >
-                    <Trash className="h-4 w-4" />
-                  </button>
+      <div className="space-y-6">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {paginatedPosts.map((post) => (
+            <div
+              key={post.id}
+              className="flex flex-col rounded-md border border-zinc-200 bg-white overflow-hidden shadow-sm dark:border-zinc-800 dark:bg-zinc-900"
+            >
+              <div className="relative aspect-video bg-zinc-100 dark:bg-zinc-950">
+                <Image
+                  src={post.image || "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=600"}
+                  alt={post.title}
+                  fill
+                  className="object-cover"
+                />
+                <div className="absolute top-4 left-4 rounded-full bg-zinc-950/70 backdrop-blur px-2.5 py-0.5 text-xxs font-bold text-white">
+                  {post.status}
                 </div>
               </div>
-            </div>
-          </div>
-        ))}
 
-        {filteredPosts.length === 0 && (
-          <p className="col-span-full py-16 text-center text-sm text-zinc-400">
-            No articles found. Click "Create Article" to share a story.
-          </p>
-        )}
+              <div className="flex-1 p-6 flex flex-col justify-between">
+                <div>
+                  <span className="text-xxs font-bold uppercase tracking-widest text-blue-600 dark:text-blue-400">
+                    {post.category}
+                  </span>
+                  <h3 className="mt-2 text-base font-bold text-zinc-900 dark:text-white line-clamp-2">
+                    {post.title}
+                  </h3>
+                  <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-400 line-clamp-3">
+                    {post.content}
+                  </p>
+                </div>
+
+                <div className="mt-6 pt-4 border-t border-zinc-100 dark:border-zinc-800 space-y-3">
+                  <div className="flex items-center justify-between text-xxs text-zinc-400 font-semibold">
+                    <div className="flex items-center gap-1.5">
+                      <User className="h-3.5 w-3.5" /> {post.authorName}
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <Clock className="h-3.5 w-3.5" />
+                      {new Date(post.createdAt).toLocaleDateString()}
+                    </div>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="flex justify-end gap-2 pt-2">
+                    <button
+                      onClick={() => openEditModal(post)}
+                      className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-200 hover:bg-zinc-50 text-zinc-600 dark:border-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-950 transition-colors cursor-pointer"
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </button>
+                    <button
+                      onClick={() => {
+                        setPostToDelete(post.id);
+                        setDeleteModalOpen(true);
+                      }}
+                      className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-red-100 text-red-600 hover:bg-red-50 dark:border-red-950/40 dark:text-red-400 dark:hover:bg-red-950/20 transition-colors cursor-pointer"
+                    >
+                      <Trash className="h-4 w-4" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+
+          {filteredPosts.length === 0 && (
+            <p className="col-span-full py-16 text-center text-sm text-zinc-400">
+              No articles found. Click "Create Article" to share a story.
+            </p>
+          )}
+        </div>
+        <Pagination meta={paginationMeta} onPageChange={setCurrentPage} />
       </div>
 
       {/* Editor Modal */}

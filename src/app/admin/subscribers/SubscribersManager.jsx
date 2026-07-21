@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Search, Download, Trash2, CheckCircle2 } from "lucide-react";
 import { deleteSubscriberAction } from "@/app/actions/subscriber";
 import ConfirmDeleteModal from "@/components/ConfirmDeleteModal";
+import Pagination from "@/components/Pagination";
 import { toast } from "sonner";
 
 export default function SubscribersManager({ initialSubscribers = [] }) {
@@ -11,11 +12,29 @@ export default function SubscribersManager({ initialSubscribers = [] }) {
   const [search, setSearch] = useState("");
   const [deleteConfirmId, setDeleteConfirmId] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 10;
 
   // Filter subscribers by search query
   const filteredSubscribers = subscribers.filter((s) =>
     s.email.toLowerCase().includes(search.toLowerCase())
   );
+
+  const totalItems = filteredSubscribers.length;
+  const totalPages = Math.ceil(totalItems / pageSize) || 1;
+  const paginatedSubscribers = filteredSubscribers.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
+
+  const paginationMeta = {
+    currentPage,
+    totalPages,
+    totalItems,
+    pageSize,
+    hasNextPage: currentPage < totalPages,
+    hasPrevPage: currentPage > 1,
+  };
 
   // Export as CSV
   const handleExportCSV = () => {
@@ -107,7 +126,7 @@ export default function SubscribersManager({ initialSubscribers = [] }) {
               </tr>
             </thead>
             <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
-              {filteredSubscribers.map((s) => (
+              {paginatedSubscribers.map((s) => (
                 <tr key={s.id} className="hover:bg-zinc-50/50 dark:hover:bg-zinc-950/20">
                   <td className="px-6 py-4">
                     <div className="font-bold text-sm text-zinc-900 dark:text-white">
@@ -150,6 +169,7 @@ export default function SubscribersManager({ initialSubscribers = [] }) {
             </tbody>
           </table>
         </div>
+        <Pagination meta={paginationMeta} onPageChange={setCurrentPage} />
       </div>
 
       {/* Delete Confirmation Modal */}
