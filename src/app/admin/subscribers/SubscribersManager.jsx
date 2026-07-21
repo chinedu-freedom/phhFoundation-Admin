@@ -87,7 +87,7 @@ export default function SubscribersManager({ initialSubscribers = [] }) {
 
         <button
           onClick={handleExportCSV}
-          className="flex h-11 items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 text-sm font-semibold text-white shadow-lg shadow-blue-500/10 hover:bg-blue-700 active:scale-[0.98] transition-all"
+          className="flex h-11 items-center cursor-pointer justify-center gap-2 rounded-xl bg-blue-600 px-5 text-sm font-semibold text-white shadow-lg shadow-blue-500/10 hover:bg-blue-700 active:scale-[0.98] transition-all"
         >
           <Download className="h-4 w-4" />
           Export to CSV

@@ -34,7 +34,7 @@ const NAV_ITEMS = [
   { href: "/admin/events", label: "Events", icon: CalendarDays },
   { href: "/admin/gallery", label: "Gallery", icon: ImageIcon },
   { href: "/admin/subscribers", label: "Subscribers", icon: Mail },
-  { href: "/admin/users", label: "User Accounts", icon: UserCog },
+  { href: "/admin/users", label: "Admin Accounts", icon: UserCog },
   { href: "/admin/audit-logs", label: "Audit Logs", icon: ShieldAlert },
 ];
 

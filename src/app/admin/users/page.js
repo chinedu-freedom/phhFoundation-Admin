@@ -2,7 +2,7 @@ import { prisma } from "@/lib/db";
 import UsersClient from "./UsersClient";
 
 export const metadata = {
-  title: "User Accounts | HH Admin",
+  title: "Admin Accounts | HH Admin",
 };
 
 export default async function AdminUsersPage() {
@@ -26,10 +26,10 @@ export default async function AdminUsersPage() {
     <div className="space-y-8">
       <div>
         <h1 className="text-3xl font-extrabold text-zinc-900 dark:text-white">
-          User Accounts & Admins
+          Admin Accounts
         </h1>
         <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
-          Manage system admin privileges, staff accounts, and registered community members.
+          Manage system administrator credentials and staff access privileges.
         </p>
       </div>
 

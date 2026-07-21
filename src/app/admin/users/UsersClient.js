@@ -82,9 +82,9 @@ export default function UsersClient({ initialUsers }) {
 
         <button
           onClick={() => setIsModalOpen(true)}
-          className="px-4 py-2 rounded-md bg-blue-600 text-white font-semibold text-xs hover:bg-blue-700 transition-colors inline-flex items-center gap-2 cursor-pointer"
+          className="px-4 py-2.5 rounded-md bg-blue-600 text-white font-semibold text-xs hover:bg-blue-700 transition-colors inline-flex items-center gap-2 cursor-pointer shadow-sm"
         >
-          <Plus className="h-4 w-4" /> Add New User / Admin
+          <Plus className="h-4 w-4" /> Add Admin Account
         </button>
       </div>
 
@@ -94,10 +94,10 @@ export default function UsersClient({ initialUsers }) {
           <table className="w-full text-left text-sm text-zinc-500 dark:text-zinc-400">
             <thead className="bg-zinc-50 text-xs font-bold uppercase tracking-wider text-zinc-400 dark:bg-zinc-950">
               <tr>
-                <th className="px-6 py-4">User</th>
+                <th className="px-6 py-4">Admin Name</th>
                 <th className="px-6 py-4">Email</th>
                 <th className="px-6 py-4">Role</th>
-                <th className="px-6 py-4">Joined Date</th>
+                <th className="px-6 py-4">Created Date</th>
                 <th className="px-6 py-4 text-right">Actions</th>
               </tr>
             </thead>
@@ -106,7 +106,7 @@ export default function UsersClient({ initialUsers }) {
                 <tr>
                   <td colSpan={5} className="px-6 py-12 text-center text-zinc-400">
                     <UserCog className="h-8 w-8 mx-auto mb-2 opacity-40" />
-                    No user accounts found.
+                    No admin accounts found.
                   </td>
                 </tr>
               ) : (
@@ -148,6 +148,7 @@ export default function UsersClient({ initialUsers }) {
                       <button
                         onClick={() => setDeletingId(user.id)}
                         className="p-1.5 rounded-lg border border-red-500/20 text-red-500 hover:bg-red-500/10 transition-colors cursor-pointer"
+                        title="Delete admin account"
                       >
                         <Trash2 className="h-3.5 w-3.5" />
                       </button>
@@ -171,7 +172,7 @@ export default function UsersClient({ initialUsers }) {
             onSubmit={handleCreateUser}
             className="bg-card w-full max-w-md rounded-2xl border border-border p-6 shadow-2xl space-y-4 animate-in fade-in zoom-in duration-200 max-h-[85vh] overflow-y-auto cursor-default"
           >
-            <h3 className="text-lg font-bold text-foreground">Create User Account</h3>
+            <h3 className="text-lg font-bold text-foreground">Create Admin Account</h3>
 
             <div className="space-y-3">
               <div>
