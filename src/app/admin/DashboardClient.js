@@ -227,7 +227,7 @@ export default function DashboardClient({ initialStats }) {
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
-                {stats.recentDonations.map((d) => (
+                {stats.recentDonations.slice(0, 5).map((d) => (
                   <tr key={d.id} className="hover:bg-muted/30 transition-colors">
                     <td className="px-4 py-3">
                       <div className="font-bold text-foreground">
@@ -275,7 +275,7 @@ export default function DashboardClient({ initialStats }) {
 
           <div className="space-y-3.5 max-h-[350px] overflow-y-auto pr-1 scrollbar-hide">
             {stats.recentVolunteers.length > 0 ? (
-              stats.recentVolunteers.map((v) => (
+              stats.recentVolunteers.slice(0, 5).map((v) => (
                 <div key={v.id} className="flex items-start gap-3 p-3 bg-background rounded-xl border border-border hover:border-border transition-colors">
                   <div className="w-9 h-9 rounded-lg bg-blue-50 dark:bg-blue-950/20 text-blue-600 dark:text-blue-400 font-bold flex items-center justify-center shrink-0">
                     {v.name.charAt(0).toUpperCase()}
