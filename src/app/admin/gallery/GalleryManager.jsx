@@ -166,35 +166,7 @@ export default function GalleryManager({ initialImages = [] }) {
         })}
       </div>
 
-      {/* Album Filter Bar */}
-      <div className="flex flex-wrap gap-2 items-center">
-        <span className="text-xs font-bold text-muted-foreground flex items-center gap-1.5 mr-2">
-          <Filter className="h-3.5 w-3.5" /> Filter Album:
-        </span>
-        <button
-          onClick={() => setActiveTab("All")}
-          className={`rounded-lg px-4 py-2 text-xs font-bold transition-all ${
-            activeTab === "All"
-              ? "bg-blue-600 text-white"
-              : "bg-muted text-muted-foreground hover:text-foreground"
-          }`}
-        >
-          All
-        </button>
-        {albumsList.map((alb) => (
-          <button
-            key={alb}
-            onClick={() => setActiveTab(alb)}
-            className={`rounded-lg px-4 py-2 text-xs font-bold transition-all ${
-              activeTab === alb
-                ? "bg-blue-600 text-white"
-                : "bg-muted text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            {alb}
-          </button>
-        ))}
-      </div>
+
 
       {/* Grid List */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
