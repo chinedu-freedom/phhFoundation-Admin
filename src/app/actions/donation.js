@@ -1,4 +1,4 @@
-﻿"use server";
+"use server";
 
 import { prisma } from "@/lib/db";
 import { sendEmail, getDonationThankYouHTML } from "@/lib/zohoMailer";
@@ -105,7 +105,7 @@ export async function confirmDonationAction(reference) {
       data: {
         action: "DONATION_RECEIVED",
         details: `Donation of ₦${donation.amount} received from ${donation.isAnonymous ? "Anonymous" : donation.donorName} for ${donation.campaign?.title || "General Fund"}. Ref: ${donation.reference}`,
-        userEmail: donation.donorEmail || "anonymous@hhfoundation.org",
+        userEmail: donation.donorEmail || "anonymous@hephzibahhumanitarianf.org",
       },
     });
 

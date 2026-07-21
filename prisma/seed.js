@@ -7,7 +7,7 @@ async function main() {
   console.log("Seeding started...");
 
   // 1. Create Admin User
-  const adminEmail = "admin@hhfoundation.org";
+  const adminEmail = "admin@hephzibahhumanitarianf.org";
   const existingAdmin = await prisma.user.findUnique({
     where: { email: adminEmail },
   });
