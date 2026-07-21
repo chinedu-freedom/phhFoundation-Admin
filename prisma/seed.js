@@ -169,6 +169,44 @@ async function main() {
   }
   console.log("Seeded testimonials");
 
+  // 6. Seed Team Members
+  const teamMembers = [
+    {
+      name: "AMB. CHINAZAEKPERE FAVOUR UMELO",
+      role: "Founder/ Executive Officer",
+      bio: "Championing humanitarian responses since 2012. Dedicated to quality education, healthcare outreaches, and youth empowerment across Nigeria.",
+      image: "/team1.jpeg",
+      order: 1,
+    },
+    {
+      name: "AMB Christian Ikoroha",
+      role: "Secretary HHF",
+      bio: "Over 10 years of experience in NGO operations and field coordination. Specializes in educational sponsorships and rural relief.",
+      image: "/team2.jpeg",
+      order: 2,
+    },
+    {
+      name: "Festus Chukwudiebere Egbo",
+      role: "Director of Operations",
+      bio: "Dedicated medical practitioner leading our rural healthcare teams to deliver free medical consults, prescription drugs, and basic surgeries.",
+      image: "/team3.jpeg",
+      order: 3,
+    },
+    {
+      name: "SERAH ONUOHA, ESQ.",
+      role: "Legal Advisor",
+      bio: "Manages volunteer coordination, distribution networks, and event logistics to ensure transparent, fast aid delivery in the field.",
+      image: "/team4.jpeg",
+      order: 4,
+    },
+  ];
+
+  await prisma.teamMember.deleteMany({});
+  for (const tm of teamMembers) {
+    await prisma.teamMember.create({ data: tm });
+  }
+  console.log("Seeded team members");
+
   console.log("Seeding completed successfully!");
 }
 
