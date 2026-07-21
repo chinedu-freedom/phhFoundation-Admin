@@ -125,19 +125,22 @@ export default function AuditLogsClient({ initialLogs }) {
                     <td className="px-6 py-4 text-xs text-muted-foreground max-w-md truncate">
                       {log.details}
                     </td>
-                    <td className="px-6 py-4 text-right space-x-2">
-                      <button
-                        onClick={() => setSelectedLog(log)}
-                        className="px-2 py-1 rounded-lg border border-border bg-background hover:bg-muted text-foreground text-xs font-medium transition-colors inline-flex items-center gap-1 cursor-pointer"
-                      >
-                        <Eye className="h-3.5 w-3.5" /> View
-                      </button>
-                      <button
-                        onClick={() => setDeletingId(log.id)}
-                        className="p-1 rounded-lg border border-red-500/20 text-red-500 hover:bg-red-500/10 transition-colors cursor-pointer"
-                      >
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </button>
+                    <td className="px-6 py-4 text-right whitespace-nowrap">
+                      <div className="inline-flex items-center justify-end gap-2">
+                        <button
+                          onClick={() => setSelectedLog(log)}
+                          className="px-2.5 py-1.5 rounded-lg border border-border bg-background hover:bg-muted text-foreground text-xs font-medium transition-colors inline-flex items-center gap-1.5 cursor-pointer"
+                        >
+                          <Eye className="h-3.5 w-3.5" /> View
+                        </button>
+                        <button
+                          onClick={() => setDeletingId(log.id)}
+                          className="p-1.5 rounded-lg border border-red-500/20 text-red-500 hover:bg-red-500/10 transition-colors cursor-pointer"
+                          title="Delete log entry"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))

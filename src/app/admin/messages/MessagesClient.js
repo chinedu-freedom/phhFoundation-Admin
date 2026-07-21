@@ -95,20 +95,22 @@ export default function MessagesClient({ initialMessages }) {
                     <td className="px-6 py-4 text-xs text-muted-foreground max-w-md truncate">
                       {msg.details}
                     </td>
-                    <td className="px-6 py-4 text-right space-x-2">
-                      <button
-                        onClick={() => setSelectedMessage(msg)}
-                        className="px-2.5 py-1.5 rounded-lg border border-border bg-background hover:bg-muted text-foreground text-xs font-medium transition-colors inline-flex items-center gap-1.5 cursor-pointer"
-                      >
-                        <Eye className="h-3.5 w-3.5" /> View
-                      </button>
-                      <button
-                        onClick={() => setDeletingId(msg.id)}
-                        className="p-1.5 rounded-lg border border-red-500/20 text-red-500 hover:bg-red-500/10 transition-colors cursor-pointer"
-                        title="Delete message"
-                      >
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </button>
+                    <td className="px-6 py-4 text-right whitespace-nowrap">
+                      <div className="inline-flex items-center justify-end gap-2">
+                        <button
+                          onClick={() => setSelectedMessage(msg)}
+                          className="px-2.5 py-1.5 rounded-lg border border-border bg-background hover:bg-muted text-foreground text-xs font-medium transition-colors inline-flex items-center gap-1.5 cursor-pointer"
+                        >
+                          <Eye className="h-3.5 w-3.5" /> View
+                        </button>
+                        <button
+                          onClick={() => setDeletingId(msg.id)}
+                          className="p-1.5 rounded-lg border border-red-500/20 text-red-500 hover:bg-red-500/10 transition-colors cursor-pointer"
+                          title="Delete message"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))
@@ -120,8 +122,14 @@ export default function MessagesClient({ initialMessages }) {
 
       {/* Message Modal Drawer */}
       {selectedMessage && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-card w-full max-w-lg rounded-2xl border border-border p-6 shadow-2xl space-y-5 animate-in fade-in zoom-in duration-200">
+        <div
+          onClick={() => setSelectedMessage(null)}
+          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 cursor-pointer"
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="bg-card w-full max-w-lg rounded-2xl border border-border p-6 shadow-2xl space-y-5 animate-in fade-in zoom-in duration-200 cursor-default"
+          >
             <div className="flex items-center justify-between border-b border-border pb-4">
               <h3 className="text-lg font-bold text-foreground flex items-center gap-2">
                 <Mail className="h-5 w-5 text-blue-600 dark:text-blue-400" />
