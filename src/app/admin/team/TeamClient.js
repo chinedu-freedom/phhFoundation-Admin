@@ -112,7 +112,7 @@ export default function TeamClient({ initialMembers }) {
               className="bg-card rounded-2xl border border-border p-5 shadow-sm space-y-4 flex flex-col justify-between"
             >
               <div className="space-y-3">
-                <div className="h-48 w-full rounded-xl bg-muted overflow-hidden border border-border">
+                <div className="relative h-48 w-full rounded-xl bg-muted overflow-hidden border border-border">
                   {member.image ? (
                     <img
                       src={member.image}
@@ -124,15 +124,13 @@ export default function TeamClient({ initialMembers }) {
                       {member.name.charAt(0)}
                     </div>
                   )}
+                  <span className="absolute top-2.5 right-2.5 text-xs px-2.5 py-0.5 rounded-full bg-blue-600 text-white font-extrabold shadow-md border border-white/20">
+                    Order #{member.order}
+                  </span>
                 </div>
 
                 <div>
-                  <div className="flex items-start justify-between gap-2">
-                    <h3 className="font-bold text-base text-foreground leading-snug">{member.name}</h3>
-                    <span className="text-xs px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-400 font-extrabold border border-blue-200 dark:border-blue-800 shrink-0">
-                      Order #{member.order}
-                    </span>
-                  </div>
+                  <h3 className="font-bold text-base text-foreground leading-snug">{member.name}</h3>
                   <p className="text-xs font-semibold text-blue-600 dark:text-blue-400 mt-1">
                     {member.role}
                   </p>
