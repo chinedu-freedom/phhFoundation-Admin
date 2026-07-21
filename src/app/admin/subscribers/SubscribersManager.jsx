@@ -1,14 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import { Search, Download, Trash2, Loader2, CheckCircle2 } from "lucide-react";
+import { Search, Download, Trash2, CheckCircle2 } from "lucide-react";
 import { deleteSubscriberAction } from "@/app/actions/subscriber";
+import ConfirmDeleteModal from "@/components/ConfirmDeleteModal";
 import { toast } from "sonner";
 
 export default function SubscribersManager({ initialSubscribers = [] }) {
   const [subscribers, setSubscribers] = useState(initialSubscribers);
   const [search, setSearch] = useState("");
-  const [deletingId, setDeletingId] = useState(null);
+  const [deleteConfirmId, setDeleteConfirmId] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // Filter subscribers by search query
   const filteredSubscribers = subscribers.filter((s) =>
@@ -47,17 +49,15 @@ export default function SubscribersManager({ initialSubscribers = [] }) {
     toast.success(`Successfully exported ${filteredSubscribers.length} subscribers to CSV.`);
   };
 
-  // Delete subscriber
-  const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to remove this subscriber?")) {
-      return;
-    }
+  // Confirm and Delete subscriber
+  const handleConfirmDelete = async () => {
+    if (!deleteConfirmId) return;
 
-    setDeletingId(id);
+    setIsDeleting(true);
     try {
-      const res = await deleteSubscriberAction(id);
+      const res = await deleteSubscriberAction(deleteConfirmId);
       if (res?.success) {
-        setSubscribers((prev) => prev.filter((s) => s.id !== id));
+        setSubscribers((prev) => prev.filter((s) => s.id !== deleteConfirmId));
         toast.success("Subscriber removed successfully.");
       } else {
         toast.error(res?.error || "Failed to remove subscriber.");
@@ -65,7 +65,8 @@ export default function SubscribersManager({ initialSubscribers = [] }) {
     } catch (err) {
       toast.error("An error occurred. Please try again.");
     } finally {
-      setDeletingId(null);
+      setIsDeleting(false);
+      setDeleteConfirmId(null);
     }
   };
 
@@ -130,16 +131,11 @@ export default function SubscribersManager({ initialSubscribers = [] }) {
                   </td>
                   <td className="px-6 py-4 text-right">
                     <button
-                      disabled={deletingId === s.id}
-                      onClick={() => handleDelete(s.id)}
+                      onClick={() => setDeleteConfirmId(s.id)}
                       className="inline-flex items-center justify-center p-2 rounded-lg text-zinc-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20 dark:hover:text-red-400 transition-all cursor-pointer"
                       title="Unsubscribe / Remove Email"
                     >
-                      {deletingId === s.id ? (
-                        <Loader2 className="h-4 w-4 animate-spin text-red-500" />
-                      ) : (
-                        <Trash2 className="h-4 w-4" />
-                      )}
+                      <Trash2 className="h-4 w-4" />
                     </button>
                   </td>
                 </tr>
@@ -155,6 +151,16 @@ export default function SubscribersManager({ initialSubscribers = [] }) {
           </table>
         </div>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmDeleteModal
+        isOpen={!!deleteConfirmId}
+        onClose={() => setDeleteConfirmId(null)}
+        onConfirm={handleConfirmDelete}
+        loading={isDeleting}
+        title="Remove Subscriber"
+        message="Are you sure you want to remove this subscriber email from your newsletter list?"
+      />
     </div>
   );
 }
