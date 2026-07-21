@@ -133,8 +133,14 @@ export default function VolunteersManager({ initialVolunteers = [] }) {
 
       {/* Motivation Letter Modal */}
       {selectedMotivation && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-          <div className="w-full max-w-md rounded-3xl bg-white p-6 border border-zinc-100 shadow-2xl dark:bg-zinc-900 dark:border-zinc-800">
+        <div
+          onClick={() => setSelectedMotivation(null)}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 cursor-pointer"
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="w-full max-w-md rounded-3xl bg-white p-6 border border-zinc-100 shadow-2xl dark:bg-zinc-900 dark:border-zinc-800 cursor-default"
+          >
             <div className="flex items-center justify-between border-b border-zinc-100 pb-4 dark:border-zinc-800">
               <h3 className="text-lg font-bold text-zinc-900 dark:text-white">
                 Motivation Letter
