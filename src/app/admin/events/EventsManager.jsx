@@ -10,12 +10,18 @@ import CustomSelect from "@/components/CustomSelect";
 import ImagePicker from "@/components/ImagePicker";
 import ConfirmDeleteModal from "@/components/ConfirmDeleteModal";
 
-export default function EventsManager({ initialEvents = [] }) {
+import UsersIcon from "lucide-react/dist/esm/icons/users";
+import Eye from "lucide-react/dist/esm/icons/eye";
+import Mail from "lucide-react/dist/esm/icons/mail";
+
+export default function EventsManager({ initialEvents = [], initialRsvps = [] }) {
   const router = useRouter();
   const { showToast } = useToast();
   const [events, setEvents] = useState(initialEvents);
+  const [rsvps, setRsvps] = useState(initialRsvps);
   const [showModal, setShowModal] = useState(false);
   const [editEvent, setEditEvent] = useState(null); // Null for create, Event object for edit
+  const [selectedGuestEvent, setSelectedGuestEvent] = useState(null);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -250,22 +256,31 @@ export default function EventsManager({ initialEvents = [] }) {
                   </div>
 
                   {/* Actions */}
-                  <div className="flex justify-end gap-2 pt-2">
+                  <div className="flex items-center justify-between pt-2">
                     <button
-                      onClick={() => openEditModal(e)}
-                      className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-200 hover:bg-zinc-50 text-zinc-600 dark:border-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-950 transition-colors cursor-pointer"
+                      onClick={() => setSelectedGuestEvent(e)}
+                      className="px-2.5 py-1.5 rounded-lg border border-blue-500/20 bg-blue-50/50 text-blue-600 dark:bg-blue-950/20 dark:text-blue-400 dark:border-blue-900/50 text-xs font-semibold hover:bg-blue-100 transition-colors inline-flex items-center gap-1.5 cursor-pointer"
                     >
-                      <Pencil className="h-4 w-4" />
+                      <UsersIcon className="h-3.5 w-3.5" /> Guests ({e.attendeesCount})
                     </button>
-                    <button
-                      onClick={() => {
-                        setEventToDelete(e.id);
-                        setDeleteModalOpen(true);
-                      }}
-                      className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-red-100 text-red-600 hover:bg-red-50 dark:border-red-950/40 dark:text-red-400 dark:hover:bg-red-950/20 transition-colors cursor-pointer"
-                    >
-                      <Trash className="h-4 w-4" />
-                    </button>
+
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => openEditModal(e)}
+                        className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-200 hover:bg-zinc-50 text-zinc-600 dark:border-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-950 transition-colors cursor-pointer"
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </button>
+                      <button
+                        onClick={() => {
+                          setEventToDelete(e.id);
+                          setDeleteModalOpen(true);
+                        }}
+                        className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-red-100 text-red-600 hover:bg-red-50 dark:border-red-950/40 dark:text-red-400 dark:hover:bg-red-950/20 transition-colors cursor-pointer"
+                      >
+                        <Trash className="h-4 w-4" />
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -406,6 +421,59 @@ export default function EventsManager({ initialEvents = [] }) {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Guest List Modal */}
+      {selectedGuestEvent && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-card w-full max-w-lg rounded-2xl border border-border p-6 shadow-2xl space-y-4 animate-in fade-in zoom-in duration-200">
+            <div className="flex items-center justify-between border-b border-border pb-3">
+              <div>
+                <h3 className="text-lg font-bold text-foreground">Guest List</h3>
+                <p className="text-xs text-muted-foreground">{selectedGuestEvent.title}</p>
+              </div>
+              <button
+                onClick={() => setSelectedGuestEvent(null)}
+                className="text-muted-foreground hover:text-foreground text-sm font-semibold cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="max-h-80 overflow-y-auto divide-y divide-border">
+              {rsvps.filter((r) => r.details?.includes(selectedGuestEvent.title)).length === 0 ? (
+                <div className="py-8 text-center text-xs text-muted-foreground">
+                  No registered guest logs found for this event.
+                </div>
+              ) : (
+                rsvps
+                  .filter((r) => r.details?.includes(selectedGuestEvent.title))
+                  .map((guest) => (
+                    <div key={guest.id} className="py-3 flex items-center justify-between text-xs">
+                      <div>
+                        <div className="font-semibold text-foreground">{guest.details}</div>
+                        <a href={`mailto:${guest.userEmail}`} className="text-blue-600 dark:text-blue-400 hover:underline">
+                          {guest.userEmail}
+                        </a>
+                      </div>
+                      <span className="text-xxs text-muted-foreground">
+                        {new Date(guest.createdAt).toLocaleDateString()}
+                      </span>
+                    </div>
+                  ))
+              )}
+            </div>
+
+            <div className="flex justify-end pt-3 border-t border-border">
+              <button
+                onClick={() => setSelectedGuestEvent(null)}
+                className="px-4 py-2 rounded-xl border border-border text-foreground font-semibold text-xs hover:bg-muted transition-colors cursor-pointer"
+              >
+                Close
+              </button>
+            </div>
           </div>
         </div>
       )}

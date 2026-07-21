@@ -2,6 +2,7 @@
 
 import { prisma } from "@/lib/db";
 import { revalidatePath } from "next/cache";
+import { sendCampaignNotification } from "@/lib/zohoMailer";
 
 export async function upsertCampaignAction(prevState, formData) {
   const id = formData.get("id")?.toString();
@@ -26,9 +27,19 @@ export async function upsertCampaignAction(prevState, formData) {
     .replace(/(^-|-$)/g, "")}-${Math.floor(1000 + Math.random() * 9000)}`;
 
   try {
+    let shouldNotify = false;
+    let campaignObj = null;
+
     if (id) {
       // Edit Campaign
-      await prisma.campaign.update({
+      const existing = await prisma.campaign.findUnique({
+        where: { id },
+      });
+      if (existing && existing.status !== "ACTIVE" && status === "ACTIVE") {
+        shouldNotify = true;
+      }
+
+      campaignObj = await prisma.campaign.update({
         where: { id },
         data: {
           title,
@@ -40,7 +51,10 @@ export async function upsertCampaignAction(prevState, formData) {
       });
     } else {
       // Create Campaign
-      await prisma.campaign.create({
+      if (status === "ACTIVE") {
+        shouldNotify = true;
+      }
+      campaignObj = await prisma.campaign.create({
         data: {
           title,
           slug,
@@ -50,6 +64,10 @@ export async function upsertCampaignAction(prevState, formData) {
           status,
         },
       });
+    }
+
+    if (shouldNotify && campaignObj) {
+      sendCampaignNotification(campaignObj).catch(console.error);
     }
 
     revalidatePath("/");

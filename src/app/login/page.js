@@ -1,32 +1,56 @@
 "use client";
 
-import { useActionState, useEffect, useState, Suspense } from "react";
+import { useState, Suspense } from "react";
 import { loginAction } from "@/app/actions/auth";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
+import { toast } from "sonner";
 
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams?.get("callbackUrl") || "/";
+  const callbackUrl = searchParams?.get("callbackUrl") || "/admin";
 
-  const [state, formAction, isPending] = useActionState(loginAction, null);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [isPending, setIsPending] = useState(false);
+  const [error, setError] = useState(null);
 
-  useEffect(() => {
-    if (state?.success) {
-      router.push(callbackUrl);
-      router.refresh();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError(null);
+    setIsPending(true);
+
+    const formData = new FormData();
+    formData.append("email", email);
+    formData.append("password", password);
+
+    try {
+      const res = await loginAction(null, formData);
+      if (res?.success) {
+        toast.success("Welcome back!");
+        setTimeout(() => {
+          window.location.href = callbackUrl;
+        }, 800);
+      } else if (res?.error) {
+        setError(res.error);
+        toast.error(res.error);
+      }
+    } catch (err) {
+      toast.error("Failed to sign in. Please check your network connection.");
+    } finally {
+      setIsPending(false);
     }
-  }, [state, callbackUrl, router]);
+  };
 
   return (
-    <form action={formAction} className="mt-8 space-y-6">
-      {state?.error && (
+    <form onSubmit={handleSubmit} className="mt-8 space-y-6">
+      {error && (
         <div className="rounded-xl bg-red-50 p-4 text-sm font-semibold text-red-700 dark:bg-red-950/20 dark:text-red-400">
-          {state.error}
+          {error}
         </div>
       )}
 
@@ -44,6 +68,8 @@ function LoginForm() {
             type="email"
             autoComplete="email"
             required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             className="mt-2 block w-full rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-sm text-zinc-900 placeholder-zinc-400 focus:border-blue-600 focus:bg-white focus:outline-none dark:border-zinc-800 dark:bg-zinc-950 dark:text-white dark:focus:bg-zinc-900"
             placeholder="you@example.com"
           />
@@ -63,6 +89,8 @@ function LoginForm() {
               type={showPassword ? "text" : "password"}
               autoComplete="current-password"
               required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               className="block w-full rounded-xl border border-zinc-200 bg-zinc-50 pl-4 pr-12 py-3 text-sm text-zinc-900 placeholder-zinc-400 focus:border-blue-600 focus:bg-white focus:outline-none dark:border-zinc-800 dark:bg-zinc-950 dark:text-white dark:focus:bg-zinc-900"
               placeholder="••••••••"
             />

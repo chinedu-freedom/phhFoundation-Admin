@@ -2,6 +2,7 @@
 
 import { prisma } from "@/lib/db";
 import { revalidatePath } from "next/cache";
+import { sendEventNotification } from "@/lib/zohoMailer";
 
 export async function upsertEventAction(prevState, formData) {
   const id = formData.get("id")?.toString();
@@ -23,9 +24,19 @@ export async function upsertEventAction(prevState, formData) {
   }
 
   try {
+    let shouldNotify = false;
+    let eventObj = null;
+
     if (id) {
       // Edit Event
-      await prisma.event.update({
+      const existing = await prisma.event.findUnique({
+        where: { id },
+      });
+      if (existing && existing.status !== "UPCOMING" && status === "UPCOMING") {
+        shouldNotify = true;
+      }
+
+      eventObj = await prisma.event.update({
         where: { id },
         data: {
           title,
@@ -39,7 +50,10 @@ export async function upsertEventAction(prevState, formData) {
       });
     } else {
       // Create Event
-      await prisma.event.create({
+      if (status === "UPCOMING") {
+        shouldNotify = true;
+      }
+      eventObj = await prisma.event.create({
         data: {
           title,
           description,
@@ -51,6 +65,10 @@ export async function upsertEventAction(prevState, formData) {
           attendeesCount: 0,
         },
       });
+    }
+
+    if (shouldNotify && eventObj) {
+      sendEventNotification(eventObj).catch(console.error);
     }
 
     revalidatePath("/admin/events");

@@ -1,7 +1,8 @@
-﻿"use server";
+"use server";
 
 import { prisma } from "@/lib/db";
 import { revalidatePath } from "next/cache";
+import { sendBlogNotification } from "@/lib/zohoMailer";
 
 export async function upsertBlogAction(prevState, formData) {
   const id = formData.get("id")?.toString();
@@ -23,9 +24,19 @@ export async function upsertBlogAction(prevState, formData) {
     .replace(/(^-|-$)/g, "")}-${Math.floor(1000 + Math.random() * 9000)}`;
 
   try {
+    let shouldNotify = false;
+    let postObj = null;
+
     if (id) {
       // Edit Post
-      await prisma.blogPost.update({
+      const existing = await prisma.blogPost.findUnique({
+        where: { id },
+      });
+      if (existing && existing.status !== "PUBLISHED" && status === "PUBLISHED") {
+        shouldNotify = true;
+      }
+
+      postObj = await prisma.blogPost.update({
         where: { id },
         data: {
           title,
@@ -39,7 +50,10 @@ export async function upsertBlogAction(prevState, formData) {
       });
     } else {
       // Create Post
-      await prisma.blogPost.create({
+      if (status === "PUBLISHED") {
+        shouldNotify = true;
+      }
+      postObj = await prisma.blogPost.create({
         data: {
           title,
           slug,
@@ -51,6 +65,10 @@ export async function upsertBlogAction(prevState, formData) {
           status,
         },
       });
+    }
+
+    if (shouldNotify && postObj) {
+      sendBlogNotification(postObj).catch(console.error);
     }
 
     revalidatePath("/admin/blog");

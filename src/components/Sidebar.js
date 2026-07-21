@@ -10,8 +10,14 @@ import {
   BookOpen, 
   CalendarDays, 
   Image as ImageIcon,
-  ArrowLeft,
-  LogOut
+  LogOut,
+  Mail,
+  Inbox,
+  Building2,
+  Quote,
+  UserCheck,
+  UserCog,
+  ShieldAlert
 } from "lucide-react";
 import { ThemeToggle } from "./ThemeToggle";
 
@@ -20,9 +26,16 @@ const NAV_ITEMS = [
   { href: "/admin/campaigns", label: "Campaigns", icon: HeartHandshake },
   { href: "/admin/donations", label: "Donations", icon: HandHeart },
   { href: "/admin/volunteers", label: "Volunteers", icon: Users },
+  { href: "/admin/messages", label: "Messages", icon: Inbox },
+  { href: "/admin/partners", label: "Partners", icon: Building2 },
+  { href: "/admin/testimonials", label: "Testimonials", icon: Quote },
+  { href: "/admin/team", label: "Team Members", icon: UserCheck },
   { href: "/admin/blog", label: "Blog Posts", icon: BookOpen },
   { href: "/admin/events", label: "Events", icon: CalendarDays },
   { href: "/admin/gallery", label: "Gallery", icon: ImageIcon },
+  { href: "/admin/subscribers", label: "Subscribers", icon: Mail },
+  { href: "/admin/users", label: "User Accounts", icon: UserCog },
+  { href: "/admin/audit-logs", label: "Audit Logs", icon: ShieldAlert },
 ];
 
 export default function Sidebar({ isCollapsed, onMobileClose }) {
