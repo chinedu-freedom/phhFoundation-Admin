@@ -127,40 +127,34 @@ export default function GalleryManager({ initialImages = [] }) {
         </button>
       </div>
 
-      {/* Album Summary Stat Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+      {/* Album Filter Bar */}
+      <div className="flex flex-wrap gap-2 items-center">
+        <span className="text-xs font-bold text-muted-foreground flex items-center gap-1.5 mr-2">
+          <Filter className="h-3.5 w-3.5" /> Filter Album:
+        </span>
         <button
           onClick={() => setActiveTab("All")}
-          className={`p-4 rounded-2xl border text-left transition-all ${
+          className={`rounded-lg px-4 py-2 text-xs font-bold transition-all cursor-pointer ${
             activeTab === "All"
-              ? "border-blue-600 bg-blue-50/40 dark:bg-blue-950/20"
-              : "border-border bg-card hover:bg-muted/40"
+              ? "bg-blue-600 text-white shadow-sm"
+              : "bg-muted text-muted-foreground hover:text-foreground"
           }`}
         >
-          <FolderClosed className="h-5 w-5 text-blue-600 mb-2" />
-          <span className="block text-xxs font-bold text-muted-foreground uppercase tracking-wider">All Albums</span>
-          <span className="block text-lg font-extrabold text-foreground font-poppins mt-1">
-            {totalCount}
-          </span>
+          All ({totalCount})
         </button>
-
         {albumsList.map((alb) => {
           const count = albumCounts[alb] || 0;
           return (
             <button
               key={alb}
               onClick={() => setActiveTab(alb)}
-              className={`p-4 rounded-2xl border text-left transition-all ${
+              className={`rounded-lg px-4 py-2 text-xs font-bold transition-all cursor-pointer ${
                 activeTab === alb
-                  ? "border-blue-600 bg-blue-50/40 dark:bg-blue-950/20"
-                  : "border-border bg-card hover:bg-muted/40"
+                  ? "bg-blue-600 text-white shadow-sm"
+                  : "bg-muted text-muted-foreground hover:text-foreground"
               }`}
             >
-              <FolderClosed className="h-5 w-5 text-zinc-500 mb-2" />
-              <span className="block text-xxs font-bold text-muted-foreground uppercase tracking-wider line-clamp-1">{alb}</span>
-              <span className="block text-lg font-extrabold text-foreground font-poppins mt-1">
-                {count}
-              </span>
+              {alb} ({count})
             </button>
           );
         })}
