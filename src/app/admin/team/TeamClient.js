@@ -125,7 +125,8 @@ export default function TeamClient({ initialMembers }) {
                     </div>
                   )}
                   <span className="absolute top-2.5 right-2.5 text-xs px-2.5 py-0.5 rounded-full bg-blue-600 text-white font-extrabold shadow-md border border-white/20">
-                    Order #{member.order}
+                    Order {member.order}
+                    {/* Order #{member.order} */}
                   </span>
                 </div>
 
@@ -188,34 +189,33 @@ export default function TeamClient({ initialMembers }) {
               {editingMember ? "Edit Team Member" : "Add Team Member"}
             </h3>
 
-            <div className="space-y-3">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label className="text-xs font-semibold text-muted-foreground block mb-1">
-                    Full Name *
-                  </label>
-                  <input
-                    type="text"
-                    name="name"
-                    required
-                    defaultValue={editingMember?.name || ""}
-                    placeholder="e.g. Dr. Hephzibah"
-                    className="w-full px-3 py-2 text-sm rounded-lg border border-input bg-background text-foreground"
-                  />
-                </div>
-                <div>
-                  <label className="text-xs font-semibold text-muted-foreground block mb-1">
-                    Official Role / Title *
-                  </label>
-                  <input
-                    type="text"
-                    name="role"
-                    required
-                    defaultValue={editingMember?.role || ""}
-                    placeholder="e.g. Founder & Executive Director"
-                    className="w-full px-3 py-2 text-sm rounded-lg border border-input bg-background text-foreground"
-                  />
-                </div>
+            <div className="space-y-4">
+              <div>
+                <label className="text-xs font-semibold text-muted-foreground block mb-1">
+                  Full Name *
+                </label>
+                <input
+                  type="text"
+                  name="name"
+                  required
+                  defaultValue={editingMember?.name || ""}
+                  placeholder="e.g. Dr. Hephzibah"
+                  className="w-full px-3 py-2 text-sm rounded-lg border border-input bg-background text-foreground"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-semibold text-muted-foreground block mb-1">
+                  Official Role / Title *
+                </label>
+                <input
+                  type="text"
+                  name="role"
+                  required
+                  defaultValue={editingMember?.role || ""}
+                  placeholder="e.g. Founder & Executive Director"
+                  className="w-full px-3 py-2 text-sm rounded-lg border border-input bg-background text-foreground"
+                />
               </div>
 
               <div>
@@ -238,31 +238,32 @@ export default function TeamClient({ initialMembers }) {
                 />
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label className="text-xs font-semibold text-muted-foreground block mb-1">
-                    LinkedIn Profile URL
-                  </label>
-                  <input
-                    type="url"
-                    name="linkedin"
-                    defaultValue={editingMember?.linkedin || ""}
-                    placeholder="https://linkedin.com/in/..."
-                    className="w-full px-3 py-2 text-sm rounded-lg border border-input bg-background text-foreground"
-                  />
-                </div>
-                <div>
-                  <label className="text-xs font-semibold text-muted-foreground block mb-1">
-                    Display Order Index
-                  </label>
-                  <input
-                    type="number"
-                    name="order"
-                    defaultValue={editingMember?.order ?? 0}
-                    placeholder="0"
-                    className="w-full px-3 py-2 text-sm rounded-lg border border-input bg-background text-foreground"
-                  />
-                </div>
+              <div>
+                <label className="text-xs font-semibold text-muted-foreground block mb-1">
+                  LinkedIn Profile URL
+                </label>
+                <input
+                  type="url"
+                  name="linkedin"
+                  defaultValue={editingMember?.linkedin || ""}
+                  placeholder="https://linkedin.com/in/..."
+                  className="w-full px-3 py-2 text-sm rounded-lg border border-input bg-background text-foreground"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-semibold text-muted-foreground block mb-1">
+                  Display Order Index (Must be Unique) *
+                </label>
+                <input
+                  type="number"
+                  name="order"
+                  required
+                  min={1}
+                  defaultValue={editingMember?.order ?? (members.length + 1)}
+                  placeholder="1"
+                  className="w-full px-3 py-2 text-sm rounded-lg border border-input bg-background text-foreground"
+                />
               </div>
             </div>
 

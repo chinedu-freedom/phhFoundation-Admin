@@ -18,6 +18,19 @@ export async function upsertTeamMemberAction(prevState, formData) {
   }
 
   try {
+    const existingOrder = await prisma.teamMember.findFirst({
+      where: {
+        order,
+        ...(id ? { id: { not: id } } : {}),
+      },
+    });
+
+    if (existingOrder) {
+      return {
+        error: `Order #${order} is already assigned to "${existingOrder.name}". Each team member must have a unique order number.`,
+      };
+    }
+
     if (id) {
       await prisma.teamMember.update({
         where: { id },
