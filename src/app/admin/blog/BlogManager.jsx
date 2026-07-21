@@ -211,6 +211,7 @@ export default function BlogManager({ initialPosts = [] }) {
                   src={post.image || "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=600"}
                   alt={post.title}
                   fill
+                  unoptimized
                   className="object-cover"
                 />
                 <div className="absolute top-4 left-4 rounded-full bg-zinc-950/70 backdrop-blur px-2.5 py-0.5 text-xxs font-bold text-white">

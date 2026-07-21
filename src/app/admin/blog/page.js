@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/db";
 import BlogManager from "./BlogManager";
 
+export const dynamic = "force-dynamic";
+
 export const metadata = {
   title: "Manage Blog Posts | HH Admin",
 };
