@@ -19,6 +19,11 @@ const poppins = Poppins({
 export const metadata = {
   title: "HH Foundation Admin Panel",
   description: "Administrative control panel for HH Foundation.",
+  icons: {
+    icon: "/logo.jpeg",
+    shortcut: "/logo.jpeg",
+    apple: "/logo.jpeg",
+  },
   robots: {
     index: false,
     follow: false,
