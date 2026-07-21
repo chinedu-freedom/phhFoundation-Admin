@@ -100,51 +100,51 @@ export default function PartnersClient({ initialPartners, initialInquiries }) {
 
   return (
     <div className="space-y-6">
-      {/* Tabs Header */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-border pb-4">
-        <div className="flex gap-2 p-1 bg-muted/50 rounded-xl border border-border">
-          <button
-            onClick={() => setActiveTab("logos")}
-            className={`px-4 py-2 text-xs font-bold rounded-lg transition-colors flex items-center gap-2 cursor-pointer ${
-              activeTab === "logos"
-                ? "bg-blue-600 text-white shadow-sm"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            <Building2 className="h-4 w-4" /> Partner Logos ({partners.length})
-          </button>
-          <button
-            onClick={() => setActiveTab("inquiries")}
-            className={`px-4 py-2 text-xs font-bold rounded-lg transition-colors flex items-center gap-2 cursor-pointer ${
-              activeTab === "inquiries"
-                ? "bg-blue-600 text-white shadow-sm"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            <FileText className="h-4 w-4" /> Form Inquiries ({inquiries.length})
-          </button>
+      {/* Search & Add Button Row */}
+      <div className="flex flex-col md:flex-row gap-4 md:items-center justify-between">
+        <div className="relative flex-1 max-w-md">
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400 pointer-events-none" />
+          <input
+            type="text"
+            placeholder="Search..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="block w-full rounded-md border border-zinc-200 bg-white h-11 pl-10 pr-4 text-sm text-zinc-900 focus:border-blue-500 focus:outline-none dark:border-zinc-800 dark:bg-zinc-900 dark:text-white transition-colors"
+          />
         </div>
 
         {activeTab === "logos" && (
           <button
             onClick={openAddModal}
-            className="px-4 py-2 rounded-md bg-blue-600 text-white font-semibold text-xs hover:bg-blue-700 transition-colors inline-flex items-center gap-2 cursor-pointer"
+            className="px-4 py-2.5 rounded-md bg-blue-600 text-white font-semibold text-xs hover:bg-blue-700 transition-colors inline-flex items-center gap-2 cursor-pointer shadow-sm"
           >
             <Plus className="h-4 w-4" /> Add Partner Logo
           </button>
         )}
       </div>
 
-      {/* Search Input */}
-      <div className="relative flex-1 max-w-md">
-        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400 pointer-events-none" />
-        <input
-          type="text"
-          placeholder="Search..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="block w-full rounded-md border border-zinc-200 bg-white h-11 pl-10 pr-4 text-sm text-zinc-900 focus:border-blue-500 focus:outline-none dark:border-zinc-800 dark:bg-zinc-900 dark:text-white transition-colors"
-        />
+      {/* Tabs Navigation Underneath */}
+      <div className="flex items-center gap-2 p-1 bg-muted/50 rounded-xl border border-border w-fit">
+        <button
+          onClick={() => setActiveTab("logos")}
+          className={`px-4 py-2 text-xs font-bold rounded-lg transition-colors flex items-center gap-2 cursor-pointer ${
+            activeTab === "logos"
+              ? "bg-blue-600 text-white shadow-sm"
+              : "text-muted-foreground hover:text-foreground"
+          }`}
+        >
+          <Building2 className="h-4 w-4" /> Partner Logos ({partners.length})
+        </button>
+        <button
+          onClick={() => setActiveTab("inquiries")}
+          className={`px-4 py-2 text-xs font-bold rounded-lg transition-colors flex items-center gap-2 cursor-pointer ${
+            activeTab === "inquiries"
+              ? "bg-blue-600 text-white shadow-sm"
+              : "text-muted-foreground hover:text-foreground"
+          }`}
+        >
+          <FileText className="h-4 w-4" /> Form Inquiries ({inquiries.length})
+        </button>
       </div>
 
       {/* TAB 1: Partner Logos Grid */}

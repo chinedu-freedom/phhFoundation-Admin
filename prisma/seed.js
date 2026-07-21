@@ -161,6 +161,30 @@ async function main() {
       quote: "Partnering with HH Foundation has been an absolute honor. Their transparency, regular updates, and direct community impact set them apart. We look forward to sponsoring more healthcare drives next year.",
       image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop&q=60",
     },
+    {
+      name: "Alhaji Musa Ibrahim",
+      role: "Community Leader, Kano Outreach",
+      quote: "The medical outreach was a lifesaver for our village. Over three hundred elders and children received free eye examinations, prescription glasses, and malaria treatments. We pray for their continued strength.",
+      image: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200&auto=format&fit=crop&q=60",
+    },
+    {
+      name: "Sister Florence Nduka",
+      role: "Women Empowerment Graduate",
+      quote: "As a widow, raising four children alone was a daily battle. Through the skills bootcamp and start-up grant, I opened my own tailoring shop. Today, I feed my family and pay their school fees myself.",
+      image: "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=200&auto=format&fit=crop&q=60",
+    },
+    {
+      name: "Dr. Amara Williams",
+      role: "Volunteer Medical Officer",
+      quote: "Serving on the frontline with HH Foundation in remote riverine areas has shown me the power of collective action. We treated conditions that would have gone ignored for years due to poverty.",
+      image: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=200&auto=format&fit=crop&q=60",
+    },
+    {
+      name: "Tunde Folawiyo",
+      role: "Disaster Relief Coordinator",
+      quote: "When the floods hit our community, HH Foundation was the first on the ground with food packs, clean drinking water, and blankets. Their rapid response saved countless lives from hunger and disease.",
+      image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&auto=format&fit=crop&q=60",
+    },
   ];
 
   await prisma.testimonial.deleteMany({});
