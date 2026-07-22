@@ -13,7 +13,7 @@ async function main() {
   });
 
   if (!existingAdmin) {
-    const hashedPassword = await bcrypt.hash("admin123", 10);
+    const hashedPassword = await bcrypt.hash("Chinedu2$", 10);
     await prisma.user.create({
       data: {
         email: adminEmail,
@@ -22,7 +22,7 @@ async function main() {
         role: "ADMIN",
       },
     });
-    console.log("Created admin user: admin@hhfoundation.org / admin123");
+    console.log("Created admin user: admin@hephzibahhumanitarianf.org / Chinedu2$");
   } else {
     console.log("Admin user already exists");
   }
