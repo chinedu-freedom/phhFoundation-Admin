@@ -169,7 +169,7 @@ async function main() {
     },
     {
       name: "Sister Florence Nduka",
-      role: "Women Empowerment Graduate",
+      role: "Human Empowerment Graduate",
       quote: "As a widow, raising four children alone was a daily battle. Through the skills bootcamp and start-up grant, I opened my own tailoring shop. Today, I feed my family and pay their school fees myself.",
       image: "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=200&auto=format&fit=crop&q=60",
     },

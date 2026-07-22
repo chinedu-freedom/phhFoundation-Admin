@@ -99,7 +99,7 @@ Programs
     Food Support
     Skill Acquisition
     Youth Empowerment
-    Women Empowerment
+    Human Empowerment
     Emergency Relief
 
 Projects
@@ -334,7 +334,7 @@ Scholarships
 
 Healthcare
 
-Women Empowerment
+Human Empowerment
 
 Youth Development
 
@@ -828,7 +828,7 @@ Footer with Social Media Links
 
 About Page: Information about the foundation.
 
-Programs Page: A listing of all programs. The list includes: Education, Scholarships, Healthcare, Food Relief, Women Empowerment, Youth Empowerment, Skill Acquisition, Emergency Relief, Community Development, Orphan Support. Allow for dynamic content management.
+Programs Page: A listing of all programs. The list includes: Education, Scholarships, Healthcare, Food Relief, Human Empowerment, Youth Empowerment, Skill Acquisition, Emergency Relief, Community Development, Orphan Support. Allow for dynamic content management.
 
 Projects Page: Showcase specific projects.
 
