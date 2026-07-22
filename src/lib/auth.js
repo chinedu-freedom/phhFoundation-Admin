@@ -33,5 +33,12 @@ export async function getSession() {
 
 export async function logoutSession() {
   const cookieStore = await cookies();
-  cookieStore.delete("admin_session");
+  cookieStore.set("admin_session", "", {
+    path: "/",
+    expires: new Date(0),
+    maxAge: 0,
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+  });
 }
