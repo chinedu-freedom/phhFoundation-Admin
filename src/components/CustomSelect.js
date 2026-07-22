@@ -32,7 +32,7 @@ export default function CustomSelect({ value, onChange, options, placeholder = "
       </button>
 
       {isOpen && (
-        <div className="absolute left-0 z-50 mt-1 min-w-full w-max max-w-xs sm:max-w-sm rounded-xl border border-zinc-200 bg-white p-1 shadow-lg dark:border-zinc-800 dark:bg-zinc-950 animate-in fade-in slide-in-from-top-1 duration-100">
+        <div className="absolute left-0 z-50 mt-1 w-full min-w-full rounded-xl border border-zinc-200 bg-white p-1 shadow-lg dark:border-zinc-800 dark:bg-zinc-950 animate-in fade-in slide-in-from-top-1 duration-100">
           {options.map((opt) => {
             const isSelected = opt.value === value;
             return (
