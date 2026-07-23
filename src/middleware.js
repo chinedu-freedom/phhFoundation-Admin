@@ -16,7 +16,7 @@ export async function middleware(request) {
       // Redirect to login
       const url = request.nextUrl.clone();
       url.pathname = "/login";
-      url.searchParams.set("callbackUrl", pathname);
+      url.search = ""; // clear all search params to keep URL clean
       return NextResponse.redirect(url);
     }
 
@@ -29,14 +29,14 @@ export async function middleware(request) {
         // Not authorized, redirect to login page with error
         const url = request.nextUrl.clone();
         url.pathname = "/login";
-        url.searchParams.set("error", "Unauthorized access. Admin role required.");
+        url.search = "";
         return NextResponse.redirect(url);
       }
     } catch (error) {
       // Invalid session, redirect to login
       const url = request.nextUrl.clone();
       url.pathname = "/login";
-      url.searchParams.set("callbackUrl", pathname);
+      url.search = "";
       return NextResponse.redirect(url);
     }
   }

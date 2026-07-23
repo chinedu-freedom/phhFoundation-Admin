@@ -48,9 +48,13 @@ function LoginForm() {
 
   return (
     <form onSubmit={handleSubmit} className="mt-8 space-y-6">
- 
+      {error && (
+        <div className="rounded-lg bg-red-50 p-4 text-sm text-red-600 dark:bg-red-950/30 dark:text-red-400">
+          {error}
+        </div>
+      )}
 
-      <div className="space-y-4">
+      <div className="space-y-5">
         <div>
           <label
             htmlFor="email"
@@ -66,7 +70,7 @@ function LoginForm() {
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="mt-2 block w-full rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-3 text-sm text-zinc-900 placeholder-zinc-400 focus:border-blue-600 focus:bg-white focus:outline-none dark:border-zinc-800 dark:bg-zinc-950 dark:text-white dark:focus:bg-zinc-900"
+            className="mt-2 block w-full rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3.5 text-sm text-zinc-900 placeholder-zinc-400 focus:border-blue-600 focus:bg-white focus:outline-none dark:border-zinc-800 dark:bg-zinc-950 dark:text-white dark:focus:bg-zinc-900"
             placeholder="you@example.com"
           />
         </div>
@@ -87,7 +91,7 @@ function LoginForm() {
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="block w-full rounded-lg border border-zinc-200 bg-zinc-50 pl-4 pr-12 py-3 text-sm text-zinc-900 placeholder-zinc-400 focus:border-blue-600 focus:bg-white focus:outline-none dark:border-zinc-800 dark:bg-zinc-950 dark:text-white dark:focus:bg-zinc-900"
+              className="block w-full rounded-xl border border-zinc-200 bg-zinc-50 pl-4 pr-12 py-3.5 text-sm text-zinc-900 placeholder-zinc-400 focus:border-blue-600 focus:bg-white focus:outline-none dark:border-zinc-800 dark:bg-zinc-950 dark:text-white dark:focus:bg-zinc-900"
               placeholder="••••••••"
             />
             <button
@@ -105,12 +109,31 @@ function LoginForm() {
         </div>
       </div>
 
+      <div className="flex items-center justify-between">
+        <label className="flex items-center space-x-2.5 cursor-pointer select-none">
+          <input
+            type="checkbox"
+            className="h-4 w-4 rounded border-zinc-300 text-blue-600 focus:ring-blue-500 dark:border-zinc-800 dark:bg-zinc-950 dark:checked:bg-blue-600"
+          />
+          <span className="text-sm text-zinc-500 dark:text-zinc-400">
+            Keep me logged in
+          </span>
+        </label>
+      </div>
+
       <button
         type="submit"
         disabled={isPending}
-        className="flex w-full items-center justify-center rounded-xl bg-blue-600 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-500/25 hover:bg-blue-700 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+        className="flex w-full items-center justify-center rounded-xl bg-blue-600 px-5 py-3.5 text-sm font-semibold text-white shadow-lg shadow-blue-500/25 hover:bg-blue-700 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        {isPending ?<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"><rect width="10" height="10" x="1" y="1" fill="currentColor" rx="1"><animate id="SVG7WybndBt" fill="freeze" attributeName="x" begin="0;SVGo3aOUHlJ.end" dur="0.2s" values="1;13"/><animate id="SVGVoKldbWM" fill="freeze" attributeName="y" begin="SVGFpk9ncYc.end" dur="0.2s" values="1;13"/><animate id="SVGKsXgPbui" fill="freeze" attributeName="x" begin="SVGaI8owdNK.end" dur="0.2s" values="13;1"/><animate id="SVG7JzAfdGT" fill="freeze" attributeName="y" begin="SVG28A4To9L.end" dur="0.2s" values="13;1"/></rect><rect width="10" height="10" x="1" y="13" fill="currentColor" rx="1"><animate id="SVGUiS2jeZq" fill="freeze" attributeName="y" begin="SVG7WybndBt.end" dur="0.2s" values="13;1"/><animate id="SVGU0vu2GEM" fill="freeze" attributeName="x" begin="SVGVoKldbWM.end" dur="0.2s" values="1;13"/><animate id="SVGOIboFeLf" fill="freeze" attributeName="y" begin="SVGKsXgPbui.end" dur="0.2s" values="1;13"/><animate id="SVG14lAaeuv" fill="freeze" attributeName="x" begin="SVG7JzAfdGT.end" dur="0.2s" values="13;1"/></rect><rect width="10" height="10" x="13" y="13" fill="currentColor" rx="1"><animate id="SVGFpk9ncYc" fill="freeze" attributeName="x" begin="SVGUiS2jeZq.end" dur="0.2s" values="13;1"/><animate id="SVGaI8owdNK" fill="freeze" attributeName="y" begin="SVGU0vu2GEM.end" dur="0.2s" values="13;1"/><animate id="SVG28A4To9L" fill="freeze" attributeName="x" begin="SVGOIboFeLf.end" dur="0.2s" values="1;13"/><animate id="SVGo3aOUHlJ" fill="freeze" attributeName="y" begin="SVG14lAaeuv.end" dur="0.2s" values="1;13"/></rect></svg> : "Sign in"}
+        {isPending ? (
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" className="animate-spin">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"></circle>
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+        ) : (
+          "Sign in"
+        )}
       </button>
     </form>
   );
@@ -118,21 +141,21 @@ function LoginForm() {
 
 export default function Login() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 px-6 py-12 dark:bg-zinc-950">
-      <div className="w-full max-w-md space-y-8 rounded-3xl bg-white p-8 shadow-xl shadow-zinc-200/50 dark:bg-zinc-900 dark:shadow-none">
+    <div className="flex min-h-screen items-center justify-center bg-white dark:bg-zinc-950 sm:bg-zinc-50 sm:dark:bg-zinc-950 px-0 sm:px-6 py-0 sm:py-12">
+      <div className="w-full h-full min-h-screen sm:min-h-0 sm:max-w-md flex flex-col justify-center sm:justify-start space-y-8 bg-white p-6 sm:p-10 sm:rounded-3xl sm:shadow-xl sm:shadow-zinc-200/50 dark:bg-zinc-950 sm:dark:bg-zinc-900 dark:shadow-none sm:border sm:border-zinc-100 sm:dark:border-zinc-800/80">
         {/* Header */}
-        <div className="flex flex-col items-center">
-          <div className="relative h-16 w-16 overflow-hidden rounded-sm dark:border-zinc-800">
+        <div className="flex flex-col items-start sm:items-center">
+          <div className="relative h-14 w-14 overflow-hidden rounded-xl border border-zinc-100 dark:border-zinc-800/50">
             <Image
               src="/logo.jpeg"
               alt="HH Foundation Logo"
               fill
               className="object-cover"
-              sizes="48px"
+              sizes="56px"
             />
           </div>
-          <h2 className="mt-6 text-3xl font-extrabold tracking-tight text-zinc-900 dark:text-white">
-            Admin Portal
+          <h2 className="mt-8 text-3xl font-bold tracking-tight text-zinc-900 dark:text-white font-poppins">
+            Welcome back
           </h2>
           <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
             Sign in to access the administrator console
